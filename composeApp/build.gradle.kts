@@ -1,0 +1,54 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+
+val nameSpace = "heaven.from.mywaifump"
+
+plugins {
+    alias(libs.plugins.heaven.from.kmp.application)
+    alias(libs.plugins.heaven.from.cmp)
+    alias(libs.plugins.heaven.from.coil)
+}
+
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation(project(":core:buildconfig"))
+            implementation(project(":core:model"))
+            api(project(":core:repository"))
+        }
+
+        commonTest.dependencies {
+        }
+
+        androidMain.dependencies {
+        }
+
+        jvmMain.dependencies {
+        }
+    }
+}
+
+dependencies {
+    debugImplementation(compose.uiTooling)
+}
+
+android {
+    namespace = nameSpace
+
+    defaultConfig {
+        applicationId = nameSpace
+        versionCode = 1
+        versionName = "1.0"
+    }
+}
+
+compose.desktop {
+    application {
+        mainClass = "$nameSpace.MainKt"
+
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = nameSpace
+            packageVersion = "1.0.0"
+        }
+    }
+}
