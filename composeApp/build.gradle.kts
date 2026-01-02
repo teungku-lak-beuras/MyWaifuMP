@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.heaven.from.kmp.application)
     alias(libs.plugins.heaven.from.cmp)
     alias(libs.plugins.heaven.from.coil)
+    alias(libs.plugins.heaven.from.room)
 }
 
 kotlin {
@@ -13,7 +14,8 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":core:buildconfig"))
             implementation(project(":core:model"))
-            api(project(":core:repository"))
+            implementation(project(":core:local"))
+            implementation(project(":core:repository"))
         }
 
         commonTest.dependencies {
@@ -38,6 +40,12 @@ android {
         applicationId = nameSpace
         versionCode = 1
         versionName = "1.0"
+    }
+
+    buildTypes {
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("debug")
+        }
     }
 }
 

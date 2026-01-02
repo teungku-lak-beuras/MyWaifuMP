@@ -2,9 +2,10 @@ package heaven.from.mywaifump.route
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import heaven.from.mywaifump.provider.RepositoryProvider
 import heaven.from.mywaifump.screen.HomeScreen
 import heaven.from.mywaifump.viewmodel.HomeViewModel
-import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun HomeRoute(
@@ -12,7 +13,9 @@ fun HomeRoute(
     settingsCallback: () -> Unit,
     aboutCallback: () -> Unit
 ) {
-    val viewModel = koinViewModel<HomeViewModel>()
+    val viewModel = viewModel {
+        HomeViewModel(RepositoryProvider.provideRepository())
+    }
 
     HomeScreen(
         helpCallback = helpCallback,

@@ -7,4 +7,8 @@ plugins {
 
 android {
     namespace = nameSpace
+
+    defaultConfig {
+        consumerProguardFiles("consumer-rules.pro")
+    }
 }

@@ -1,5 +1,4 @@
 package heaven.from.local
 
-class LocalDataSource {
-
+object LocalDataSource {
 }

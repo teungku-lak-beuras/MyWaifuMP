@@ -5,15 +5,22 @@ import heaven.from.model.WaifuModelV1
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
-import org.koin.core.annotation.Single
 
-@Single
 class Repository(
-    private val nekosBestApiRepository: NekosBestApiRepository
+    private val myWaifuLocalRepository: MyWaifuLocalRepository
 ) {
+    private val nekosBestApiRepository: NekosBestApiRepository by lazy {
+        NekosBestApiRepository()
+    }
+
     fun getNetworkWaifu(amount: Int): Flow<ApiState<List<WaifuModelV1>>> {
         return nekosBestApiRepository
             .getWaifu(amount = amount)
+            .flowOn(Dispatchers.Default)
+    }
+    fun getLocalWaifu(): Flow<ApiState<List<WaifuModelV1>>> {
+        return myWaifuLocalRepository
+            .getAllWaifu()
             .flowOn(Dispatchers.Default)
     }
 }

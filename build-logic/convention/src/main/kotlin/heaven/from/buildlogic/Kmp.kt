@@ -42,29 +42,19 @@ fun Project.configureKotlinMultiplatform(kmpExtension: KotlinMultiplatformExtens
 //            binaries.executable()
 //        }
 
-        // Let Koin annotation know here to look for the generated files.
         sourceSets.apply {
             commonMain.configure {
                 kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
             }
 
             commonMain.dependencies {
-                api(libs.findLibrary("koin.annotation").get())
-                implementation(project.dependencies.platform(libs.findLibrary("koin.bom").get()))
-                implementation(libs.findLibrary("koin.core").get())
-                implementation(libs.findLibrary("koin.compose").get())
-                implementation(libs.findLibrary("koin.compose.viewmodel").get())
-                implementation(libs.findLibrary("koin.compose.viewmodel.navigation").get())
                 implementation(libs.findLibrary("napier").get())
             }
 
             commonTest.dependencies {
-                implementation(libs.findLibrary("kotlin.test").get())
-                implementation(libs.findLibrary("koin.test").get())
             }
 
             androidMain.dependencies {
-                implementation(libs.findLibrary("koin.android").get())
             }
         }
     }
@@ -79,6 +69,5 @@ fun Project.configureKotlinMultiplatform(kmpExtension: KotlinMultiplatformExtens
     // Needed for the project itself to get the Koin compiler working, will not be included
     // within the resulted code.
     dependencies {
-        add("kspCommonMainMetadata", libs.findLibrary("koin.compiler").get())
     }
 }

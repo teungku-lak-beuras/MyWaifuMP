@@ -3,7 +3,6 @@ package heaven.from.mywaifump
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import heaven.from.buildconfig.DEBUG_MODE
-import heaven.from.mywaifump.di.initKoin
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 
@@ -12,9 +11,6 @@ fun main() {
     if (DEBUG_MODE) {
         Napier.base(DebugAntilog())
     }
-
-    // Initialise Koin.
-    initKoin()
 
     application {
         Window(

@@ -36,6 +36,11 @@ class RoomConventionPlugin : Plugin<Project> {
             extensions.configure<RoomExtension> {
                 schemaDirectory("$projectDir/schemas")
             }
+
+            dependencies.apply {
+                add("kspAndroid", libs.findLibrary("androidx.room.compiler").get())
+                add("kspJvm", libs.findLibrary("androidx.room.compiler").get())
+            }
         }
     }
 }

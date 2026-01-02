@@ -4,8 +4,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import heaven.from.mywaifump.provider.RepositoryProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -13,13 +19,29 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            MyWaifu()
+            val myWaifuAppVisible by remember { mutableStateOf(false) }
+
+            when (RepositoryProvider
+                .initialiseMyWaifuRoomDao(this)
+                .flowOn(Dispatchers.IO)
+                .collectAsStateWithLifecycle(true)
+                .value
+            ) {
+                true -> {
+                    AnimatedVisibility(
+                        visible = myWaifuAppVisible
+                    ) {
+                        MyWaifuLaunchScreen()
+                    }
+                }
+                false -> {
+                    AnimatedVisibility(
+                        visible = myWaifuAppVisible
+                    ) {
+                        MyWaifu()
+                    }
+                }
+            }
         }
     }
-}
-
-@Preview
-@Composable
-fun MyWaifuAndroidPreview() {
-    MyWaifu()
 }

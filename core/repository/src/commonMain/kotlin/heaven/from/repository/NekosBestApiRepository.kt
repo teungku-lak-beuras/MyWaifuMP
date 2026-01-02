@@ -9,12 +9,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.io.IOException
 import kotlinx.serialization.SerializationException
-import org.koin.core.annotation.Single
 
-@Single
-class NekosBestApiRepository(
-    private val nekosBestApiDataSource: NekosBestApiDataSource
-) {
+class NekosBestApiRepository() {
+    private val nekosBestApiDataSource: NekosBestApiDataSource by lazy {
+        NekosBestApiDataSource()
+    }
+
     fun getWaifu(amount: Int): Flow<ApiState<List<WaifuModelV1>>> = flow {
         emit(ApiState.Loading)
 

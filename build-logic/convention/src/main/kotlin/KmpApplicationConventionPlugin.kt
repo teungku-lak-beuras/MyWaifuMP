@@ -1,7 +1,6 @@
 
 import com.android.build.api.dsl.ApplicationExtension
 import com.google.devtools.ksp.gradle.KspExtension
-import heaven.from.buildlogic.configureKoinSafety
 import heaven.from.buildlogic.configureKotlinAndroid
 import heaven.from.buildlogic.configureKotlinMultiplatform
 import heaven.from.buildlogic.findPluginId
@@ -33,7 +32,6 @@ class KmpApplicationConventionPlugin : Plugin<Project> {
             }
 
             extensions.configure<KspExtension> {
-                configureKoinSafety(this)
             }
         }
     }

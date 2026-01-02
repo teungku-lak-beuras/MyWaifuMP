@@ -9,9 +9,9 @@ import coil3.network.ktor3.KtorNetworkFetcherFactory
 import coil3.request.crossfade
 import com.example.compose.MyWaifuTheme
 import heaven.from.buildconfig.DEBUG_MODE
-import heaven.from.mywaifump.di.provideCoilLogger
 import heaven.from.mywaifump.constant.WindowSize
 import heaven.from.mywaifump.navigation.MyWaifuNavigation
+import heaven.from.mywaifump.provider.CoilProvider.provideCoilLogger
 import heaven.from.mywaifump.utility.LocalWindowSize
 import heaven.from.mywaifump.utility.provideWindowSizeClass
 import org.jetbrains.compose.ui.tooling.preview.Preview
