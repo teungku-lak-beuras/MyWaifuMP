@@ -41,7 +41,7 @@ import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
 import coil3.compose.rememberConstraintsSizeResolver
 import coil3.request.ImageRequest
-import heaven.from.model.ApiState
+import heaven.from.model.MyWaifuState
 import heaven.from.model.WaifuModelV1
 import heaven.from.mywaifump.component.MyWaifuTopAppBar
 import heaven.from.mywaifump.component.sizeMedium
@@ -245,12 +245,12 @@ fun ErrorItem() {
 @Composable
 fun Content(
     paddingValues: PaddingValues,
-    waifu: ApiState<List<WaifuModelV1>>,
+    waifu: MyWaifuState<List<WaifuModelV1>>,
 ) {
     val modifier = Modifier.fillMaxSize()
 
     when (waifu) {
-        is ApiState.Loading -> {
+        is MyWaifuState.Loading -> {
             Column(
                 modifier = modifier.padding(paddingValues),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -259,7 +259,7 @@ fun Content(
                 LoadingItem()
             }
         }
-        is ApiState.Success -> {
+        is MyWaifuState.Success -> {
             LazyVerticalGrid(
                 modifier = modifier,
                 columns = GridCells.Adaptive(128.dp),
@@ -279,7 +279,7 @@ fun Content(
                 }
             }
         }
-        is ApiState.Error -> {
+        is MyWaifuState.Error -> {
             Column(
                 modifier = modifier.padding(paddingValues),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -296,7 +296,7 @@ fun HomeScreen(
     helpCallback: () -> Unit,
     settingsCallback: () -> Unit,
     aboutCallback: () -> Unit,
-    waifu: ApiState<List<WaifuModelV1>>,
+    waifu: MyWaifuState<List<WaifuModelV1>>,
 ) {
     val windowSizeClass = LocalWindowSize.current
     var topAppBarExpanded by remember { mutableStateOf(true) }
@@ -398,7 +398,7 @@ fun HomeScreenPreview1() {
             helpCallback = {},
             settingsCallback = {},
             aboutCallback = {},
-            waifu = ApiState.Success(
+            waifu = MyWaifuState.Success(
                 data = listOf(
                     WaifuModelV1(
                         artistName = "Yagen",
@@ -428,7 +428,7 @@ fun HomeScreenPreview2() {
             helpCallback = {},
             settingsCallback = {},
             aboutCallback = {},
-            waifu = ApiState.Success(
+            waifu = MyWaifuState.Success(
                 data = listOf(
                     WaifuModelV1(
                         artistName = "Yagen",

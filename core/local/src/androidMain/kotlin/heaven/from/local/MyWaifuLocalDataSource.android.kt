@@ -8,21 +8,6 @@ import heaven.from.local.entity.MyWaifuRoomEntity
 actual class MyWaifuLocalDataSource(
     private val dao: MyWaifuRoomDao
 ) : MyWaifuLocalDataSourceContract {
-//    actual companion object {
-//        actual fun Builder(database: Any): MyWaifuLocalDataSource {
-//            if (database is MyWaifuRoomDao) {
-//                return MyWaifuLocalDataSource(database)
-//            }
-//            throw IllegalArgumentException(
-//                """
-//                    STOP! Cannot provide ${this::class.java.simpleName}. You provide a type
-//                    of ${database::class.java.simpleName}, but the required type for this
-//                    implementation is ${MyWaifuRoomDao::class.java.simpleName}.
-//                """
-//            )
-//        }
-//    }
-
     override suspend fun getAllWaifu(): List<MyWaifuEntity> {
         val roomWaifu = dao.getAllWaifu()
         val waifu = mutableListOf<MyWaifuEntity>()

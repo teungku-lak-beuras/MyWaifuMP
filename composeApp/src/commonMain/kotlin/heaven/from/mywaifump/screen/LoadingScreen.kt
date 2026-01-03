@@ -1,4 +1,4 @@
-package heaven.from.mywaifump
+package heaven.from.mywaifump.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,7 +12,7 @@ import heaven.from.mywaifump.utility.MyWaifuPreview
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun MyWaifuLaunchScreen() {
+fun LoadingScreen() {
     Surface(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -27,6 +27,6 @@ fun MyWaifuLaunchScreen() {
 
 @Preview
 @Composable
-fun MyWaifuLaunchScreenPreview() = MyWaifuPreview {
-    MyWaifuLaunchScreen()
+fun LoadingScreenPreview() = MyWaifuPreview {
+    LoadingScreen()
 }

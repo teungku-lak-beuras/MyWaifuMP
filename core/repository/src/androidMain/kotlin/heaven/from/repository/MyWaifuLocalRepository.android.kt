@@ -1,7 +1,7 @@
 package heaven.from.repository
 
 import heaven.from.local.contract.MyWaifuLocalDataSourceContract
-import heaven.from.model.ApiState
+import heaven.from.model.MyWaifuState
 import heaven.from.model.WaifuModelV1
 import kotlinx.coroutines.flow.flow
 import kotlinx.io.IOException
@@ -9,8 +9,8 @@ import kotlinx.io.IOException
 actual class MyWaifuLocalRepository actual constructor(
     private val myWaifuLocalDataSource: MyWaifuLocalDataSourceContract
 ) {
-    actual fun getAllWaifu() = flow<ApiState<List<WaifuModelV1>>> {
-        emit(ApiState.Loading)
+    actual fun getAllWaifu() = flow<MyWaifuState<List<WaifuModelV1>>> {
+        emit(MyWaifuState.Loading)
 
         try {
             val roomWaifu = myWaifuLocalDataSource.getAllWaifu()
@@ -26,10 +26,10 @@ actual class MyWaifuLocalRepository actual constructor(
                     )
                 )
             }
-            emit(ApiState.Success(data = waifu))
+            emit(MyWaifuState.Success(data = waifu))
         }
         catch (exception: IOException) {
-            emit(ApiState.Error(error = exception.message.toString()))
+            emit(MyWaifuState.Error(message = exception.message.toString()))
         }
     }
 

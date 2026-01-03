@@ -1,23 +1,16 @@
-package heaven.from.local.utility
+package heaven.from.mywaifump.utility
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-/**
- * Truly a lazy one.
- *
- * Should be safe for KMP and coroutines. All later call gives no effect. Explanation below:
- *
- * 1.
- */
-actual class LazyWaifu<T: Any, R: Any>(
+class MyLazyWaifu<T: Any, R: Any>(
     private val initialiser: suspend (T) -> R
 ) {
     private val mutex = Mutex()
     private var initialised = false
     private lateinit var value: R
 
-    actual suspend fun get(transmitter: T): R {
+    suspend fun get(transmitter: T): R {
         if (initialised) {
             return value
         }
@@ -27,6 +20,15 @@ actual class LazyWaifu<T: Any, R: Any>(
                 initialised = true
             }
             value
+        }
+    }
+
+    fun getCached(): R? {
+        if (initialised) {
+            return value
+        }
+        else {
+            return null
         }
     }
 }

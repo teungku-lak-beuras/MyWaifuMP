@@ -15,6 +15,7 @@ kotlin {
             implementation(project(":core:buildconfig"))
             implementation(project(":core:model"))
             implementation(project(":core:local"))
+            implementation(project(":core:network"))
             implementation(project(":core:repository"))
         }
 
