@@ -26,18 +26,6 @@ fun MyWaifu() {
         else -> WindowSize.Compact
     }
 
-    // Set Coil 3 image loader.
-    setSingletonImageLoaderFactory { context ->
-        ImageLoader
-            .Builder(context)
-            .components {
-                add(KtorNetworkFetcherFactory())
-            }
-            .logger(if (DEBUG_MODE) provideCoilLogger() else null)
-            .crossfade(true)
-            .build()
-    }
-
     CompositionLocalProvider(LocalWindowSize provides windowSize) {
         MyWaifuTheme {
             MyWaifuNavigation()

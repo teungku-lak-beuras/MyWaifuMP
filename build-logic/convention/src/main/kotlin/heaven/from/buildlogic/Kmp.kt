@@ -27,21 +27,16 @@ fun Project.configureKotlinMultiplatform(kmpExtension: KotlinMultiplatformExtens
 
         jvm()
 
-        js(IR) {
-            browser {
-                binaries.executable()
-            }
-        }
-
-        /**
-         * Dropped support for WasmJS for now. The ecosystem is already perfect, the ground is
-         * stable, the weather is bright, but there are no plants grow big right now.
-         */
-//        @OptIn(ExperimentalWasmDsl::class)
-//        wasmJs {
-//            browser()
-//            binaries.executable()
+//        js(IR) {
+//            browser {
+//                binaries.executable()
+//            }
 //        }
+
+        wasmJs {
+            browser()
+            binaries.executable()
+        }
 
         sourceSets.apply {
             commonMain.configure {

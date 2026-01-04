@@ -26,13 +26,13 @@ jobs:
           java-version: 21
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-      - name: Build JS browser distribution
-        run: ./gradlew :composeApp:jsBrowserDistribution
+      - name: Build WasmJS browser distribution
+        run: ./gradlew :composeApp:wasmJsBrowserDistribution
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: composeApp/build/dist/js/productionExecutable
+          path: composeApp/build/dist/wasmJs/productionExecutable
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4

@@ -11,13 +11,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import coil3.ImageLoader
+import coil3.compose.setSingletonImageLoaderFactory
+import coil3.network.ktor3.KtorNetworkFetcherFactory
+import coil3.request.crossfade
 import heaven.from.buildconfig.DEBUG_MODE
 import heaven.from.model.MyWaifuState
+import heaven.from.mywaifump.provider.CoilProvider.provideCoilLogger
 import heaven.from.mywaifump.provider.MyWaifuRepositoryProvider
 import heaven.from.mywaifump.screen.ErrorScreen
 import heaven.from.mywaifump.screen.LoadingScreen
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
 
 fun main() {
     // Initialise Napier.
@@ -38,6 +45,22 @@ fun main() {
                 .provideRepository()
                 .collectAsState(MyWaifuState.Loading)
                 .value
+
+            // Set Coil 3 image loader.
+            setSingletonImageLoaderFactory { context ->
+                ImageLoader
+                    .Builder(context)
+                    .components {
+                        add(
+                            KtorNetworkFetcherFactory(
+                                httpClient = HttpClient(CIO)
+                            )
+                        )
+                    }
+                    .logger(if (DEBUG_MODE) provideCoilLogger() else null)
+                    .crossfade(true)
+                    .build()
+            }
 
             when (myWaifuRepository) {
                 // True should be last so that any remaining content visible will disappear first.
