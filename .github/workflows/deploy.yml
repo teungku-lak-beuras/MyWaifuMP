@@ -1,0 +1,38 @@
+name: MyWaifuMP
+
+on:
+  push:
+    branches: ["master"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+      - name: Build JS browser distribution
+        run: ./gradlew :composeApp:jsBrowserDistribution
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: composeApp/build/dist/js/productionExecutable
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
