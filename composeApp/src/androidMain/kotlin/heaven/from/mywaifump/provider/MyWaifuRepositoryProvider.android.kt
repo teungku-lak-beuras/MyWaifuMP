@@ -23,7 +23,9 @@ actual object MyWaifuRepositoryProvider {
         // --- Network ---
         val engine = NekosBestApiProvider.provideEngine()
         val nekosBestApiDataSource = NekosBestApiDataSource(
-            client = NekosBestApiProvider.provideHttpClient(engine = engine)
+            client = NekosBestApiProvider.provideHttpClient(
+                engine = engine
+            )
         )
         val nekosBestApiRepository = NekosBestApiRepository(
             nekosBestApiDataSource = nekosBestApiDataSource
@@ -32,7 +34,9 @@ actual object MyWaifuRepositoryProvider {
         // --- Local ---
         val myWaifuRoomDatabaseBuilder = MyWaifuRoomProvider.getRoomDatabaseBuilder(context)
         val myWaifuRoomDatabase = MyWaifuRoomProvider.getRoomDatabase(myWaifuRoomDatabaseBuilder)
-        val myWaifuLocalDataSource = MyWaifuLocalDataSource(dao = myWaifuRoomDatabase.getDao())
+        val myWaifuLocalDataSource = MyWaifuLocalDataSource(
+            dao = myWaifuRoomDatabase.getDao()
+        )
         val myWaifuLocalRepository = MyWaifuLocalRepository(
             myWaifuLocalDataSource = myWaifuLocalDataSource
         )

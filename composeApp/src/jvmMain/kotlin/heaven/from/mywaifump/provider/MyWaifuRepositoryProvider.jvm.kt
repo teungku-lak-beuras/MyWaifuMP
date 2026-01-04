@@ -19,7 +19,9 @@ actual object MyWaifuRepositoryProvider {
     private var myWaifuRepository = MyLazyWaifu<Boolean, MyWaifuRepository> { transmitter ->
         val engine = NekosBestApiProvider.provideEngine()
         val nekosBestApiDataSource = NekosBestApiDataSource(
-            client = NekosBestApiProvider.provideHttpClient(engine = engine)
+            client = NekosBestApiProvider.provideHttpClient(
+                engine = engine
+            )
         )
         val nekosBestApiRepository = NekosBestApiRepository(
             nekosBestApiDataSource = nekosBestApiDataSource
@@ -27,7 +29,9 @@ actual object MyWaifuRepositoryProvider {
 
         val myWaifuRoomDatabaseBuilder = MyWaifuRoomProvider.getRoomDatabaseBuilder()
         val myWaifuRoomDatabase = MyWaifuRoomProvider.getRoomDatabase(myWaifuRoomDatabaseBuilder)
-        val myWaifuLocalDataSource = MyWaifuLocalDataSource(dao = myWaifuRoomDatabase.getDao())
+        val myWaifuLocalDataSource = MyWaifuLocalDataSource(
+            dao = myWaifuRoomDatabase.getDao()
+        )
         val myWaifuLocalRepository = MyWaifuLocalRepository(
             myWaifuLocalDataSource = myWaifuLocalDataSource
         )
@@ -50,7 +54,9 @@ actual object MyWaifuRepositoryProvider {
                 // in Android counterpart.
                 emit(
                     MyWaifuState.Success(
-                        data = myWaifuRepository.get(transmitter = true)
+                        data = myWaifuRepository.get(
+                            transmitter = true
+                        )
                     )
                 )
             }

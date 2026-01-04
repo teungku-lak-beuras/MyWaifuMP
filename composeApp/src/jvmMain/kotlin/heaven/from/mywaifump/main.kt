@@ -3,6 +3,7 @@ package heaven.from.mywaifump
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,7 +35,7 @@ fun main() {
             var error by remember { mutableStateOf(false) }
             var errorMessage: String = "Initial error message."
             val myWaifuRepository = MyWaifuRepositoryProvider
-                .provideRepository(this)
+                .provideRepository()
                 .collectAsState(MyWaifuState.Loading)
                 .value
 
@@ -62,6 +63,9 @@ fun main() {
                 visible = loading,
                 enter = scaleIn(
                     animationSpec = spring()
+                ),
+                exit = scaleOut(
+                    animationSpec = spring()
                 )
             ) {
                 LoadingScreen()
@@ -69,6 +73,9 @@ fun main() {
             AnimatedVisibility(
                 visible = success,
                 enter = scaleIn(
+                    animationSpec = spring()
+                ),
+                exit = scaleOut(
                     animationSpec = spring()
                 )
             ) {
@@ -78,6 +85,9 @@ fun main() {
                 visible = error
                 ,
                 enter = scaleIn(
+                    animationSpec = spring()
+                ),
+                exit = scaleOut(
                     animationSpec = spring()
                 )
             ) {

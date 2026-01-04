@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,6 +57,9 @@ class MainActivity : ComponentActivity() {
                 visible = loading,
                 enter = scaleIn(
                     animationSpec = spring()
+                ),
+                exit = scaleOut(
+                    animationSpec = spring()
                 )
             ) {
                 LoadingScreen()
@@ -63,6 +67,9 @@ class MainActivity : ComponentActivity() {
             AnimatedVisibility(
                 visible = success,
                 enter = scaleIn(
+                    animationSpec = spring()
+                ),
+                exit = scaleOut(
                     animationSpec = spring()
                 )
             ) {
@@ -72,6 +79,9 @@ class MainActivity : ComponentActivity() {
                 visible = error
                 ,
                 enter = scaleIn(
+                    animationSpec = spring()
+                ),
+                exit = scaleOut(
                     animationSpec = spring()
                 )
             ) {
