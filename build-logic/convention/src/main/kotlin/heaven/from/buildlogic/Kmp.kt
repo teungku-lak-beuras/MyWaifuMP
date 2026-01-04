@@ -27,9 +27,10 @@ fun Project.configureKotlinMultiplatform(kmpExtension: KotlinMultiplatformExtens
 
         jvm()
 
-        js {
-            browser()
-            binaries.executable()
+        js(IR) {
+            browser {
+                binaries.executable()
+            }
         }
 
         /**
