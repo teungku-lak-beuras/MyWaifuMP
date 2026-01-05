@@ -25,7 +25,7 @@ class KtorConventionPlugin : Plugin<Project> {
                         implementation(libs.findLibrary("ktor.client.cio").get())
                     }
 
-                    jsMain.dependencies {
+                    wasmJsMain.dependencies {
                         implementation(libs.findLibrary("ktor.client.js").get())
                     }
                 }

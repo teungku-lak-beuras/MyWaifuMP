@@ -7,14 +7,17 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -25,11 +28,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,6 +56,9 @@ import heaven.from.mywaifump.layout.MyWaifuScaffold
 import heaven.from.mywaifump.layout.MyWaifuSwitchingTopAppBar
 import heaven.from.mywaifump.utility.LocalWindowSize
 import heaven.from.mywaifump.utility.MyWaifuPreview
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import mywaifump.composeapp.generated.resources.Res
 import mywaifump.composeapp.generated.resources.about
 import mywaifump.composeapp.generated.resources.app_name
@@ -245,14 +253,36 @@ fun ErrorItem() {
 @Composable
 fun Content(
     paddingValues: PaddingValues,
+    isLoadingMore: Boolean,
     waifu: MyWaifuState<List<WaifuModelV1>>,
+    loadMoreCallback: () -> Unit
 ) {
-    val modifier = Modifier.fillMaxSize()
+    val state = rememberLazyGridState()
+
+    LaunchedEffect(state) {
+        snapshotFlow {
+            val lastVisibleItemIndex = state.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+            val totalItem = state.layoutInfo.totalItemsCount
+            lastVisibleItemIndex >= totalItem - 1
+        }
+            .distinctUntilChanged()
+            .debounce(50L)
+            .filter { it }
+            .collect {
+                println("At the bottom")
+                println("${!isLoadingMore}")
+                if (!isLoadingMore) {
+                    loadMoreCallback.invoke()
+                }
+            }
+    }
 
     when (waifu) {
         is MyWaifuState.Loading -> {
             Column(
-                modifier = modifier.padding(paddingValues),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -261,7 +291,7 @@ fun Content(
         }
         is MyWaifuState.Success -> {
             LazyVerticalGrid(
-                modifier = modifier,
+                modifier = Modifier.fillMaxSize(),
                 columns = GridCells.Adaptive(128.dp),
                 contentPadding = paddingValues + PaddingValues(
                     top = 16.dp,
@@ -270,18 +300,32 @@ fun Content(
                     bottom = 16.dp
                 ),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                state = state
             ) {
                 items(
                     items = waifu.data
                 ) { item ->
                     SuccessItem(waifu = item)
                 }
+                if (isLoadingMore) {
+                    item(
+                        span = { GridItemSpan(maxLineSpan) }
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                }
             }
         }
         is MyWaifuState.Error -> {
             Column(
-                modifier = modifier.padding(paddingValues),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -293,10 +337,12 @@ fun Content(
 
 @Composable
 fun HomeScreen(
+    waifu: MyWaifuState<List<WaifuModelV1>>,
+    isLoadingMore: Boolean,
     helpCallback: () -> Unit,
     settingsCallback: () -> Unit,
     aboutCallback: () -> Unit,
-    waifu: MyWaifuState<List<WaifuModelV1>>,
+    loadMoreCallback: () -> Unit
 ) {
     val windowSizeClass = LocalWindowSize.current
     var topAppBarExpanded by remember { mutableStateOf(true) }
@@ -347,7 +393,9 @@ fun HomeScreen(
             ) { paddingValues ->
                 Content(
                     paddingValues = paddingValues,
-                    waifu = waifu
+                    waifu = waifu,
+                    isLoadingMore = isLoadingMore,
+                    loadMoreCallback = loadMoreCallback
                 )
             }
         }
@@ -383,11 +431,30 @@ fun HomeScreen(
             ) { paddingValues ->
                 Content(
                     paddingValues = paddingValues,
-                    waifu = waifu
+                    waifu = waifu,
+                    isLoadingMore = isLoadingMore,
+                    loadMoreCallback = loadMoreCallback
                 )
             }
         }
     }
+}
+
+fun getWaifuList(): List<WaifuModelV1> {
+    return listOf(
+        WaifuModelV1(
+            artistName = "Yagen",
+            artistHref = "https://www.pixiv.net/en/users/39846570",
+            sourceUrl = "https://www.pixiv.net/en/artworks/128662564",
+            url = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png"
+        ),
+        WaifuModelV1(
+            artistName = "Yagen",
+            artistHref = "https://www.pixiv.net/en/users/39846570",
+            sourceUrl = "https://www.pixiv.net/en/artworks/128662564",
+            url = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png"
+        )
+    )
 }
 
 @Preview
@@ -395,25 +462,14 @@ fun HomeScreen(
 fun HomeScreenPreview1() {
     MyWaifuPreview {
         HomeScreen(
+            waifu = MyWaifuState.Success(
+                data = getWaifuList()
+            ),
+            isLoadingMore = true,
             helpCallback = {},
             settingsCallback = {},
             aboutCallback = {},
-            waifu = MyWaifuState.Success(
-                data = listOf(
-                    WaifuModelV1(
-                        artistName = "Yagen",
-                        artistHref = "https://www.pixiv.net/en/users/39846570",
-                        sourceUrl = "https://www.pixiv.net/en/artworks/128662564",
-                        url = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png"
-                    ),
-                    WaifuModelV1(
-                        artistName = "Yagen",
-                        artistHref = "https://www.pixiv.net/en/users/39846570",
-                        sourceUrl = "https://www.pixiv.net/en/artworks/128662564",
-                        url = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png"
-                    )
-                )
-            )
+            loadMoreCallback = {}
         )
     }
 }
@@ -425,25 +481,14 @@ fun HomeScreenPreview2() {
         windowSize = WindowSize.Medium
     ) {
         HomeScreen(
+            waifu = MyWaifuState.Success(
+                data = getWaifuList()
+            ),
+            isLoadingMore = true,
             helpCallback = {},
             settingsCallback = {},
             aboutCallback = {},
-            waifu = MyWaifuState.Success(
-                data = listOf(
-                    WaifuModelV1(
-                        artistName = "Yagen",
-                        artistHref = "https://www.pixiv.net/en/users/39846570",
-                        sourceUrl = "https://www.pixiv.net/en/artworks/128662564",
-                        url = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png"
-                    ),
-                    WaifuModelV1(
-                        artistName = "Yagen",
-                        artistHref = "https://www.pixiv.net/en/users/39846570",
-                        sourceUrl = "https://www.pixiv.net/en/artworks/128662564",
-                        url = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png"
-                    )
-                )
-            )
+            loadMoreCallback = {}
         )
     }
 }

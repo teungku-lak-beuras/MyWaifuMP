@@ -27,8 +27,8 @@ class RoomConventionPlugin : Plugin<Project> {
                         implementation(libs.findLibrary("androidx.sqlite.bundled").get())
                     }
 
-                    jsMain.dependencies {
-                        implementation(libs.findLibrary("indexeddb-core").get())
+                    wasmJsMain.dependencies {
+//                        implementation(libs.findLibrary("indexeddb-core").get())
                     }
                 }
             }

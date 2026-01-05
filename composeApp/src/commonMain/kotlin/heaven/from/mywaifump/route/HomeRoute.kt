@@ -18,9 +18,11 @@ fun HomeRoute(
     }
 
     HomeScreen(
+        waifu = viewModel.waifu.collectAsState().value,
+        isLoadingMore = viewModel.isLoadingMore,
         helpCallback = helpCallback,
         settingsCallback = settingsCallback,
         aboutCallback = aboutCallback,
-        waifu = viewModel.waifu.collectAsState().value
+        loadMoreCallback = { viewModel.getMoreWaifu() }
     )
 }
