@@ -53,7 +53,6 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     .logger(if (DEBUG_MODE) provideCoilLogger() else null)
-                    .crossfade(true)
                     .build()
             }
 

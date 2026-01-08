@@ -18,11 +18,12 @@ fun HomeRoute(
     }
 
     HomeScreen(
-        waifu = viewModel.waifu.collectAsState().value,
+        waifu = viewModel.nekosiaCatWaifu.collectAsState().value,
         isLoadingMore = viewModel.isLoadingMore,
+        isInitialyLoaded = viewModel.isInitialyLoaded,
         helpCallback = helpCallback,
         settingsCallback = settingsCallback,
         aboutCallback = aboutCallback,
-        loadMoreCallback = { viewModel.getMoreWaifu() }
+        loadMoreCallback = { viewModel.getMoreNekosiaCatWaifu() }
     )
 }

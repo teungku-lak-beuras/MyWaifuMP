@@ -4,10 +4,13 @@ import heaven.from.local.MyWaifuLocalDataSource
 import heaven.from.model.MyWaifuState
 import heaven.from.mywaifump.utility.MyLazyWaifu
 import heaven.from.network.NekosBestApiDataSource
+import heaven.from.network.NekosiaCatApiDataSource
 import heaven.from.network.provider.NekosBestApiProvider
+import heaven.from.network.provider.NekosiaCatApiProvider
 import heaven.from.repository.MyWaifuLocalRepository
 import heaven.from.repository.MyWaifuRepository
 import heaven.from.repository.NekosBestApiRepository
+import heaven.from.repository.NekosiaCatApiRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -26,6 +29,16 @@ actual object MyWaifuRepositoryProvider {
             nekosBestApiDataSource = nekosBestApiDataSource
         )
 
+        val nekosiaCatApiEngine = NekosiaCatApiProvider.provideEngine()
+        val nekosiaCatApiDataSource = NekosiaCatApiDataSource(
+            client = NekosiaCatApiProvider.provideHttpClient(
+                engine = nekosiaCatApiEngine
+            )
+        )
+        val nekosiaCatApiRepository = NekosiaCatApiRepository(
+            nekosiaCatApiDataSource = nekosiaCatApiDataSource
+        )
+
         val myWaifuLocalDataSource = MyWaifuLocalDataSource()
         val myWaifuLocalRepository = MyWaifuLocalRepository(
             myWaifuLocalDataSource = myWaifuLocalDataSource
@@ -34,10 +47,10 @@ actual object MyWaifuRepositoryProvider {
         // --- Result ---
         MyWaifuRepository(
             myWaifuLocalRepository = myWaifuLocalRepository,
-            nekosBestApiRepository = nekosBestApiRepository
+            nekosBestApiRepository = nekosBestApiRepository,
+            nekosiaCatApiRepository = nekosiaCatApiRepository
         )
     }
-
 
     actual fun provideRepository(parameter: Any?): Flow<MyWaifuState<MyWaifuRepository>> {
         return flow {

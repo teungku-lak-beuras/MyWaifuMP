@@ -37,15 +37,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Modifier.Companion.then
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImagePainter
+import coil3.compose.AsyncImagePainter.State.Empty.painter
 import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
 import coil3.compose.rememberConstraintsSizeResolver
 import coil3.request.ImageRequest
+import coil3.size.Size
+import coil3.size.SizeResolver
+import heaven.from.model.MyWaifuModelV2
 import heaven.from.model.MyWaifuState
 import heaven.from.model.WaifuModelV1
 import heaven.from.mywaifump.component.MyWaifuTopAppBar
@@ -161,13 +167,14 @@ fun LoadingItem() {
 
 @Composable
 fun SuccessItem(
-    waifu: WaifuModelV1
+    waifu: MyWaifuModelV2
 ) {
-    val sizeResolver = rememberConstraintsSizeResolver()
     val imagePainter = rememberAsyncImagePainter(
         model = ImageRequest
             .Builder(LocalPlatformContext.current)
-            .data(waifu.url)
+            .data(waifu.cdnCompressedImageUrl)
+            // Deleting this will severely hurt performance.
+            .size(width = 300, height = Int.MAX_VALUE)
             .build()
     )
     val state by imagePainter.state.collectAsState()
@@ -200,10 +207,9 @@ fun SuccessItem(
                     }
                     is AsyncImagePainter.State.Success -> {
                         Image(
-                            modifier = sizeResolver,
-                            painter = imagePainter,
+                            contentScale = ContentScale.Crop,
                             contentDescription = "Waifu artist's name: ${waifu.artistName}",
-                            contentScale = ContentScale.Crop
+                            painter = imagePainter
                         )
                     }
                     is AsyncImagePainter.State.Error -> {
@@ -226,7 +232,7 @@ fun SuccessItem(
                 modifier = Modifier.padding(top = sizeSmall),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                text = "Waifu taken from: ${waifu.sourceUrl}"
+                text = "Waifu taken from: ${waifu.imageSourceUrl}"
             )
         }
     }
@@ -254,27 +260,29 @@ fun ErrorItem() {
 fun Content(
     paddingValues: PaddingValues,
     isLoadingMore: Boolean,
-    waifu: MyWaifuState<List<WaifuModelV1>>,
+    isInitialyLoaded: Boolean,
+    waifu: MyWaifuState<List<MyWaifuModelV2>>,
     loadMoreCallback: () -> Unit
 ) {
     val state = rememberLazyGridState()
 
-    LaunchedEffect(state) {
-        snapshotFlow {
-            val lastVisibleItemIndex = state.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
-            val totalItem = state.layoutInfo.totalItemsCount
-            lastVisibleItemIndex >= totalItem - 1
-        }
-            .distinctUntilChanged()
-            .debounce(50L)
-            .filter { it }
-            .collect {
-                println("At the bottom")
-                println("${!isLoadingMore}")
-                if (!isLoadingMore) {
-                    loadMoreCallback.invoke()
-                }
+    if (isInitialyLoaded) {
+        LaunchedEffect(state) {
+            snapshotFlow {
+                val lastVisibleItemIndex = state.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+                val totalItem = state.layoutInfo.totalItemsCount
+                lastVisibleItemIndex >= totalItem - 1
             }
+                .distinctUntilChanged()
+                .debounce(50L)
+                // Need false value emission I think instead of true value only.
+//                .filter { it }
+                .collect {
+                    if (!isLoadingMore) {
+                        loadMoreCallback.invoke()
+                    }
+                }
+        }
     }
 
     when (waifu) {
@@ -304,6 +312,7 @@ fun Content(
                 state = state
             ) {
                 items(
+                    key = { it.id },
                     items = waifu.data
                 ) { item ->
                     SuccessItem(waifu = item)
@@ -337,8 +346,9 @@ fun Content(
 
 @Composable
 fun HomeScreen(
-    waifu: MyWaifuState<List<WaifuModelV1>>,
+    waifu: MyWaifuState<List<MyWaifuModelV2>>,
     isLoadingMore: Boolean,
+    isInitialyLoaded: Boolean,
     helpCallback: () -> Unit,
     settingsCallback: () -> Unit,
     aboutCallback: () -> Unit,
@@ -395,6 +405,7 @@ fun HomeScreen(
                     paddingValues = paddingValues,
                     waifu = waifu,
                     isLoadingMore = isLoadingMore,
+                    isInitialyLoaded = isInitialyLoaded,
                     loadMoreCallback = loadMoreCallback
                 )
             }
@@ -433,6 +444,7 @@ fun HomeScreen(
                     paddingValues = paddingValues,
                     waifu = waifu,
                     isLoadingMore = isLoadingMore,
+                    isInitialyLoaded = isInitialyLoaded,
                     loadMoreCallback = loadMoreCallback
                 )
             }
@@ -440,19 +452,55 @@ fun HomeScreen(
     }
 }
 
-fun getWaifuList(): List<WaifuModelV1> {
+fun getWaifuList(): List<MyWaifuModelV2> {
     return listOf(
-        WaifuModelV1(
+        MyWaifuModelV2(
+            cdnImageUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
+            cdnCompressedImageUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
+            imageSourceUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
+            directImageSourceUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
+            category = "cute",
+            rating = "safe",
+            tags = emptyList(),
             artistName = "Yagen",
-            artistHref = "https://www.pixiv.net/en/users/39846570",
-            sourceUrl = "https://www.pixiv.net/en/artworks/128662564",
-            url = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png"
+            artistUrl = "https://www.pixiv.net/en/users/39846570",
+            copyright = "(c) Yagen. All rights reserved"
         ),
-        WaifuModelV1(
+        MyWaifuModelV2(
+            cdnImageUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
+            cdnCompressedImageUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
+            imageSourceUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
+            directImageSourceUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
+            category = "cute",
+            rating = "safe",
+            tags = emptyList(),
             artistName = "Yagen",
-            artistHref = "https://www.pixiv.net/en/users/39846570",
-            sourceUrl = "https://www.pixiv.net/en/artworks/128662564",
-            url = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png"
+            artistUrl = "https://www.pixiv.net/en/users/39846570",
+            copyright = "(c) Yagen. All rights reserved"
+        ),
+        MyWaifuModelV2(
+            cdnImageUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
+            cdnCompressedImageUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
+            imageSourceUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
+            directImageSourceUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
+            category = "cute",
+            rating = "safe",
+            tags = emptyList(),
+            artistName = "Yagen",
+            artistUrl = "https://www.pixiv.net/en/users/39846570",
+            copyright = "(c) Yagen. All rights reserved"
+        ),
+        MyWaifuModelV2(
+            cdnImageUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
+            cdnCompressedImageUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
+            imageSourceUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
+            directImageSourceUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
+            category = "cute",
+            rating = "safe",
+            tags = emptyList(),
+            artistName = "Yagen",
+            artistUrl = "https://www.pixiv.net/en/users/39846570",
+            copyright = "(c) Yagen. All rights reserved"
         )
     )
 }
@@ -466,6 +514,7 @@ fun HomeScreenPreview1() {
                 data = getWaifuList()
             ),
             isLoadingMore = true,
+            isInitialyLoaded = true,
             helpCallback = {},
             settingsCallback = {},
             aboutCallback = {},
@@ -485,6 +534,7 @@ fun HomeScreenPreview2() {
                 data = getWaifuList()
             ),
             isLoadingMore = true,
+            isInitialyLoaded = true,
             helpCallback = {},
             settingsCallback = {},
             aboutCallback = {},

@@ -2,6 +2,9 @@ package heaven.from.network.provider
 
 import heaven.from.buildconfig.DEBUG_MODE
 import heaven.from.buildconfig.NEKOS_BEST_API
+import heaven.from.network.constant.CONNECT_TIMEOUT
+import heaven.from.network.constant.REQUEST_TIMEOUT
+import heaven.from.network.constant.SOCKET_TIMEOUT
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngineConfig
