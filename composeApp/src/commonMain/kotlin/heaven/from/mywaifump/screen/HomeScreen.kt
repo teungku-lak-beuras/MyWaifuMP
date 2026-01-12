@@ -4,6 +4,11 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,6 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -37,31 +43,27 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.Modifier.Companion.then
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImagePainter
-import coil3.compose.AsyncImagePainter.State.Empty.painter
 import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
-import coil3.compose.rememberConstraintsSizeResolver
 import coil3.request.ImageRequest
-import coil3.size.Size
-import coil3.size.SizeResolver
 import heaven.from.model.MyWaifuModelV2
 import heaven.from.model.MyWaifuState
-import heaven.from.model.WaifuModelV1
 import heaven.from.mywaifump.component.MyWaifuTopAppBar
 import heaven.from.mywaifump.component.sizeMedium
 import heaven.from.mywaifump.component.sizeSmall
+import heaven.from.mywaifump.composition_provider.LocalWindowSize
 import heaven.from.mywaifump.constant.WindowSize
 import heaven.from.mywaifump.layout.MyWaifuScaffold
 import heaven.from.mywaifump.layout.MyWaifuSwitchingTopAppBar
-import heaven.from.mywaifump.utility.LocalWindowSize
 import heaven.from.mywaifump.utility.MyWaifuPreview
+import heaven.from.mywaifump.utility.plus
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -79,7 +81,6 @@ import mywaifump.composeapp.generated.resources.settings
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import plus
 
 @Composable
 fun Dropdown(
@@ -158,7 +159,7 @@ fun LoadingItem() {
             painter = painterResource(Res.drawable.picture)
         )
         Text(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(sizeSmall),
             style = MaterialTheme.typography.bodyLarge,
             text = stringResource(Res.string.loading)
         )
@@ -181,9 +182,34 @@ fun SuccessItem(
     val imageModifier = Modifier
         .height(200.dp)
         .fillMaxWidth()
+    val interactionSource = remember { MutableInteractionSource() }
 
     Surface(
-        modifier = Modifier.clip(RoundedCornerShape(sizeMedium)),
+        modifier = Modifier
+            .clip(RoundedCornerShape(sizeMedium))
+            .indication(
+                interactionSource = interactionSource,
+                indication = ripple(
+                    color = Color.Black
+                )
+            )
+            .hoverable(
+                interactionSource = interactionSource,
+                enabled = true
+            )
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = { offset ->
+                        val pressEvent = PressInteraction.Press(offset)
+
+                        interactionSource.emit(pressEvent)
+                        tryAwaitRelease()
+                        interactionSource.emit(PressInteraction.Release(pressEvent))
+                    },
+                    onLongPress = {}
+                )
+            }
+        ,
         color = MaterialTheme.colorScheme.primaryContainer
     ) {
         Column(
@@ -249,7 +275,7 @@ fun ErrorItem() {
             painter = painterResource(Res.drawable.error_bug)
         )
         Text(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(sizeSmall),
             style = MaterialTheme.typography.bodyLarge,
             text = stringResource(Res.string.error)
         )
@@ -269,15 +295,28 @@ fun Content(
     if (isInitialyLoaded) {
         LaunchedEffect(state) {
             snapshotFlow {
-                val lastVisibleItemIndex = state.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+                // Last *visible* item index or -1 if empty.
+                val lastVisibleItemIndex = state
+                    .layoutInfo
+                    .visibleItemsInfo
+                    .lastOrNull()
+                    ?.index ?: -1
+                // Total item.
                 val totalItem = state.layoutInfo.totalItemsCount
+
+                /**
+                 * Emit whether last *visible* item index is larger or equal to the *actual* last
+                 * item index (item list size - 1) or not. The values emitted are ridiculously
+                 * lots upon scrolling, hence the need to be filtered (code below). The U.I. needs
+                 * to be noticed with the emission value only when it switches from true to false,
+                 * and vice versa (whether the user has scrolled past to the bottom or not).
+                 */
                 lastVisibleItemIndex >= totalItem - 1
             }
-                .distinctUntilChanged()
-                .debounce(50L)
-                // Need false value emission I think instead of true value only.
-//                .filter { it }
-                .collect {
+                .debounce(100L)              // Delay to save energy.
+                .distinctUntilChanged()      // Filter out all subsequent same emission values.
+                .filter { it }               // Filter out all false values.
+                .collect {                   // This block will launch only when true value emitted.
                     if (!isLoadingMore) {
                         loadMoreCallback.invoke()
                     }
@@ -302,13 +341,13 @@ fun Content(
                 modifier = Modifier.fillMaxSize(),
                 columns = GridCells.Adaptive(128.dp),
                 contentPadding = paddingValues + PaddingValues(
-                    top = 16.dp,
-                    start = 16.dp,
-                    end = 16.dp,
-                    bottom = 16.dp
+                    top = sizeMedium,
+                    start = sizeMedium,
+                    end = sizeMedium,
+                    bottom = sizeMedium
                 ),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(sizeMedium),
+                verticalArrangement = Arrangement.spacedBy(sizeMedium),
                 state = state
             ) {
                 items(
@@ -453,56 +492,25 @@ fun HomeScreen(
 }
 
 fun getWaifuList(): List<MyWaifuModelV2> {
-    return listOf(
-        MyWaifuModelV2(
-            cdnImageUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
-            cdnCompressedImageUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
-            imageSourceUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
-            directImageSourceUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
-            category = "cute",
-            rating = "safe",
-            tags = emptyList(),
-            artistName = "Yagen",
-            artistUrl = "https://www.pixiv.net/en/users/39846570",
-            copyright = "(c) Yagen. All rights reserved"
-        ),
-        MyWaifuModelV2(
-            cdnImageUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
-            cdnCompressedImageUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
-            imageSourceUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
-            directImageSourceUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
-            category = "cute",
-            rating = "safe",
-            tags = emptyList(),
-            artistName = "Yagen",
-            artistUrl = "https://www.pixiv.net/en/users/39846570",
-            copyright = "(c) Yagen. All rights reserved"
-        ),
-        MyWaifuModelV2(
-            cdnImageUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
-            cdnCompressedImageUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
-            imageSourceUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
-            directImageSourceUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
-            category = "cute",
-            rating = "safe",
-            tags = emptyList(),
-            artistName = "Yagen",
-            artistUrl = "https://www.pixiv.net/en/users/39846570",
-            copyright = "(c) Yagen. All rights reserved"
-        ),
-        MyWaifuModelV2(
-            cdnImageUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
-            cdnCompressedImageUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
-            imageSourceUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
-            directImageSourceUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
-            category = "cute",
-            rating = "safe",
-            tags = emptyList(),
-            artistName = "Yagen",
-            artistUrl = "https://www.pixiv.net/en/users/39846570",
-            copyright = "(c) Yagen. All rights reserved"
+    val waifuList = mutableListOf<MyWaifuModelV2>()
+
+    for (i in 0..16) {
+        waifuList.add(
+            MyWaifuModelV2(
+                cdnImageUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
+                cdnCompressedImageUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
+                imageSourceUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
+                directImageSourceUrl = "https://nekos.best/api/v2/waifu/5cd32e1d-351f-43c3-93ac-9f9ac51d58b1.png",
+                category = "cute",
+                rating = "safe",
+                tags = emptyList(),
+                artistName = "Yagen",
+                artistUrl = "https://www.pixiv.net/en/users/39846570",
+                copyright = "(c) Yagen. All rights reserved"
+            )
         )
-    )
+    }
+    return waifuList
 }
 
 @Preview
