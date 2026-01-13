@@ -1,21 +1,26 @@
 package heaven.from.mywaifump.screen
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -44,11 +49,22 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
+import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
 import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
@@ -170,23 +186,111 @@ fun LoadingItem() {
 fun SuccessItem(
     waifu: MyWaifuModelV2
 ) {
+    val imageRequest = ImageRequest
+        .Builder(LocalPlatformContext.current)
+        .data(waifu.cdnCompressedImageUrl)
     val imagePainter = rememberAsyncImagePainter(
-        model = ImageRequest
-            .Builder(LocalPlatformContext.current)
-            .data(waifu.cdnCompressedImageUrl)
+        model = imageRequest
             // Deleting this will severely hurt performance.
             .size(width = 300, height = Int.MAX_VALUE)
             .build()
     )
-    val state by imagePainter.state.collectAsState()
-    val imageModifier = Modifier
-        .height(200.dp)
-        .fillMaxWidth()
+    val imagePainterState by imagePainter.state.collectAsState()
     val interactionSource = remember { MutableInteractionSource() }
+    var isLongPressed by remember { mutableStateOf(false) }
+    var imagePainterContainerOffset by remember { mutableStateOf(Offset.Zero) }
+    var peekImagePointerOffset by remember { mutableStateOf(Offset.Zero) }
+    var peekImageSize by remember { mutableStateOf(IntSize.Zero) }
+    val peekImageAnimationKeyframe = remember { Animatable(0f) }
+    var peekImageVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isLongPressed) {
+        if (isLongPressed) {
+            peekImageVisible = true
+
+            peekImageAnimationKeyframe.animateTo(
+                targetValue = 1f,
+                animationSpec = spring()
+            )
+        }
+        else {
+            peekImageAnimationKeyframe.animateTo(
+                targetValue = 0f,
+                animationSpec = spring()
+            )
+
+            peekImageVisible = false
+        }
+    }
+    if (peekImageVisible) {
+        Popup {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(0.4f))
+            ) {
+                val currentWindowWidth = LocalWindowInfo.current.containerSize.width
+                val currentWindowHeight = LocalWindowInfo.current.containerSize.height
+                var offsetX: Dp
+                var offsetY: Dp
+
+                with(LocalDensity.current) {
+                    offsetX = (
+                        peekImagePointerOffset.x +
+                            imagePainterContainerOffset.x -
+                            (peekImageSize.width / 2)
+                        )
+                        .coerceIn(
+                            minimumValue = 0.0f,
+                            maximumValue = (currentWindowWidth - peekImageSize.width).toFloat()
+                        )
+                        .toDp()
+                    offsetY = (
+                        peekImagePointerOffset.y +
+                            imagePainterContainerOffset.y -
+                            peekImageSize.height -
+                            100
+                        )
+                        .coerceIn(
+                            minimumValue = 0.0f,
+                            maximumValue = (currentWindowHeight - peekImageSize.height).toFloat()
+                        )
+                        .toDp()
+                }
+
+                AsyncImage(
+                    modifier = Modifier
+                        .onGloballyPositioned { layoutCoordinates ->
+                            peekImageSize = layoutCoordinates.size
+                        }
+                        .offset(
+                            x = offsetX,
+                            y = offsetY
+                        )
+                        .graphicsLayer {
+                            scaleX = peekImageAnimationKeyframe.value
+                            scaleY = peekImageAnimationKeyframe.value
+                            alpha = peekImageAnimationKeyframe.value
+                            transformOrigin = TransformOrigin(
+                                pivotFractionX = 0.5f,
+                                pivotFractionY = 1.0f
+                            )
+                        },
+                    contentDescription = null,
+                    model = imageRequest
+                        .size(width = 600, height = Int.MAX_VALUE)
+                        .build()
+                )
+            }
+        }
+    }
 
     Surface(
         modifier = Modifier
             .clip(RoundedCornerShape(sizeMedium))
+            .onGloballyPositioned { layoutCoordinates ->
+                imagePainterContainerOffset = layoutCoordinates.positionInWindow()
+            }
             .indication(
                 interactionSource = interactionSource,
                 indication = ripple(
@@ -205,21 +309,27 @@ fun SuccessItem(
                         interactionSource.emit(pressEvent)
                         tryAwaitRelease()
                         interactionSource.emit(PressInteraction.Release(pressEvent))
+                        isLongPressed = false
                     },
-                    onLongPress = {}
+                    onLongPress = { offset ->
+                        isLongPressed = true
+                        peekImagePointerOffset = offset
+                    }
                 )
-            }
-        ,
+            },
         color = MaterialTheme.colorScheme.primaryContainer
     ) {
         Column(
             modifier = Modifier.padding(sizeSmall)
         ) {
             Surface(
-                modifier = imageModifier.clip(RoundedCornerShape(sizeSmall)),
+                modifier = Modifier
+                    .height(200.dp)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(sizeSmall)),
                 color = MaterialTheme.colorScheme.tertiaryContainer
             ) {
-                when (state) {
+                when (imagePainterState) {
                     is AsyncImagePainter.State.Empty,
                     is AsyncImagePainter.State.Loading -> {
                         Column(
