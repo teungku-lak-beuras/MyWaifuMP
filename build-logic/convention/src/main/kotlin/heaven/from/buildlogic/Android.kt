@@ -26,12 +26,6 @@ internal fun Project.configureKotlinAndroid(
             }
         }
 
-        buildTypes {
-            getByName("release") {
-                isMinifyEnabled = true
-            }
-        }
-
         packaging {
             resources {
                 excludes += "/META-INF/{AL2.0,LGPL2.1}"

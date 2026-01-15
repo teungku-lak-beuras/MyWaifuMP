@@ -11,6 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import heaven.from.mywaifump.constant.sizeMedium
+import heaven.from.mywaifump.constant.sizeSmall
+import heaven.from.mywaifump.constant.sizeSmaller
 import heaven.from.mywaifump.constant.topAppBarMenuSize
 
 @Composable

@@ -16,7 +16,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.network.ktor3.KtorNetworkFetcherFactory
-import coil3.request.crossfade
 import heaven.from.buildconfig.DEBUG_MODE
 import heaven.from.model.MyWaifuState
 import heaven.from.mywaifump.provider.CoilProvider.provideCoilLogger

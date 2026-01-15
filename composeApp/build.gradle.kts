@@ -30,10 +30,6 @@ kotlin {
     }
 }
 
-dependencies {
-    debugImplementation(compose.uiTooling)
-}
-
 android {
     namespace = nameSpace
 
@@ -45,6 +41,7 @@ android {
 
     buildTypes {
         getByName("release") {
+            isMinifyEnabled = true
             signingConfig = signingConfigs.getByName("debug")
         }
     }
@@ -56,6 +53,8 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+
+            includeAllModules = true
             packageName = nameSpace
             packageVersion = "1.0.0"
         }

@@ -14,7 +14,6 @@ import androidx.compose.ui.window.ComposeViewport
 import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.network.ktor3.KtorNetworkFetcherFactory
-import coil3.request.crossfade
 import heaven.from.buildconfig.DEBUG_MODE
 import heaven.from.model.MyWaifuState
 import heaven.from.mywaifump.provider.CoilProvider.provideCoilLogger
@@ -24,7 +23,6 @@ import heaven.from.mywaifump.screen.LoadingScreen
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.engine.js.Js
 
 @OptIn(ExperimentalComposeUiApi::class)

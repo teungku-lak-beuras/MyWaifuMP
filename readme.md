@@ -1,6 +1,6 @@
 # Hi :)
 
-This is MyWaifu ~~Android~~ Kotlin Multi Platform project.
+This is MyWaifu Kotlin Multi Platform project.
 
 The aim of this project is to hunt for waifus.
 
@@ -10,8 +10,6 @@ Apart from getting big in size (caching), this project will not get
 big at anything else, at all.
 
 The code is aimed to be reusable.
-
-The project files structure follows the "Now In Android" project.
 
 I hope that this project is useful for anyone out there. Amen.
 
@@ -25,96 +23,67 @@ consider your suggestion.
 
 Thank you, and stay healthy.
 
-## Hi again :)
+# Building the project
 
-This is a Kotlin Multiplatform project targeting Android, ~~iOS~~,
-Web (only JS for now, WasmJS is planned), and Desktop (JVM).
+## Requirements
 
-* [/composeApp](./composeApp/src) is for code that will be shared
-across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code
-    that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only
-    the platform indicated in the folder name. For example, if you
-    want to use Apple’s CoreCrypto for the iOS part of your Kotlin
-    app, the [iosMain](./composeApp/src/iosMain/kotlin) folder would
-    be the right place for such calls. Similarly, if you want to edit
-    the Desktop (JVM) specific part, the
-    [jvmMain](./composeApp/src/jvmMain/kotlin) folder is the
-    appropriate location.
-* ~~[/iosApp](./iosApp/iosApp) contains iOS applications. Even if
-  you’re sharing your UI with Compose Multiplatform, you need this
-  entry point for your iOS app. This is also where you should add
-  SwiftUI code for your project.~~
+1. Basic knowledge of using terminal / command line processor. Ideally,
+   you should have known how to navigate and change the directory 
+   location (`cd` command).
+2. Java Development Kit (JDK) version 17 or newer. I am using
+   [Adoptium's distribution, Temurin](
+   https://adoptium.net/temurin/releases?version=17&os=any&arch=any
+   ). Ideally, when you type `java -version` from the terminal / command
+   line processor, it should display something like this:
+   ```
+   openjdk 17.0.17 2025-10-21
+   OpenJDK Runtime Environment Temurin-17.0.17+10 (build 17.0.17+10)
+   OpenJDK 64-Bit Server VM Temurin-17.0.17+10 (build 17.0.17+10, mixed mode, sharing)
+   ```
+3. Some mobile data (around 2 GBs) or WiFi. This is for initial download
+   only. Or, if you just want to try it, visit the GitHub page link at the
+   right side of this page.
 
-### Build and Run Android Application
+## Steps
 
-To build and run the development version of the Android app, use the
-run configuration from the run widget in your IDE’s toolbar or build
-it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
-
-### Build and Run Desktop (JVM) Application
-
-To build and run the development version of the desktop app, use the
-run configuration from the run widget in your IDE’s toolbar or run
-it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:run
-  ```
-
-### Build and Run Web Application
-
-To build and run the development version of the web app, use the run
-configuration from the run widget in your IDE's toolbar or run it
-directly from the terminal:
-- for the Wasm target (faster, modern browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :composeApp:wasmJsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :composeApp:wasmJsBrowserDevelopmentRun
-    ```
-- for the JS target (slower, supports older browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :composeApp:jsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :composeApp:jsBrowserDevelopmentRun
-    ```
-
-### ~~Build and Run iOS Application~~
-
-~~To build and run the development version of the iOS app, use the
-run configuration from the run widget in your IDE’s toolbar or open
-the [/iosApp](./iosApp) directory in Xcode and run it from there.~~
-
----
-
-Learn more about
-[Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
-
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in
-the public Slack channel
-[#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on
-[YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
+1. Navigate to the project root directory where this `readme.md`
+   file is approachable from the command line.
+2. Build according to your platform target:
+   - Windows executable (EXE) file:
+     - From the terminal/command line processor:
+       ```shell
+       # Powershell
+       ./gradlew :composeApp:createDistributable
+       # or command prompt (CMD)
+       gradlew :composeApp:createDistributable
+       ```
+     - Final executable file could be found in:
+       `<root_folder>composeApp\build\compose\binaries\main\app\heaven.from.mywaifump\heaven.from.mywaifump.exe`
+   - Android application package (APK) file:
+     - From the terminal/command line processor:
+       ```shell
+       # Powershell
+       ./gradlew :composeApp:assembleRelease
+       # or command prompt (CMD)
+       gradlew :composeApp:assembleRelease
+     - Final APK file could be found in:
+       `<root_folder>\composeApp\build\outputs\apk\release\composeApp-release.apk`
+   - Web assembly JS runnable HTML distribution file:
+     - From the terminal/command line processor:
+       ```shell
+       # Powershell
+       ./gradlew :composeApp:wasmJsBrowserDistribution
+       # or command prompt (CMD)
+       gradlew :composeApp:wasmJsBrowserDistribution
+     - Final runnable HTML file could be found in:
+       `<root_folder>\composeApp\build\dist\wasmJs\productionExecutable\index.html`
+     - The runnable HTML file *cannot* directly executed inside a browser
+       due to cross-origin limitation (web browser fundamental safety).
+       Instead, you can provide this file from your HTTP server, e.g.:
+       - Navigate to the HTML produced before in terminal/command line
+         processor. Then, execute this command:
+         ```shell
+         python -m http.server 8000
+         ```
+       - Then goto http://localhost:8000 in your web browser.
+3. Enjoy your waifu. :)

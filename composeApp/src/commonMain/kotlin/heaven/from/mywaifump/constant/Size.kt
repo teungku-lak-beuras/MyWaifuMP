@@ -1,4 +1,4 @@
-package heaven.from.mywaifump.component
+package heaven.from.mywaifump.constant
 
 import androidx.compose.ui.unit.dp
 

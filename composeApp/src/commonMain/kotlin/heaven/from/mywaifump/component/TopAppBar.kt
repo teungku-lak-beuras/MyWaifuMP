@@ -32,7 +32,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import heaven.from.mywaifump.constant.shape
+import heaven.from.mywaifump.constant.sizeMedium
 import heaven.from.mywaifump.constant.topAppBarMenuSize
 import heaven.from.mywaifump.utility.MyWaifuPreview
 import mywaifump.composeapp.generated.resources.Res
@@ -43,7 +45,6 @@ import mywaifump.composeapp.generated.resources.caret_up
 import mywaifump.composeapp.generated.resources.menu_burger
 import mywaifump.composeapp.generated.resources.search
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
  * Muvara.

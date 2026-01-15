@@ -60,6 +60,7 @@ import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -72,8 +73,8 @@ import coil3.request.ImageRequest
 import heaven.from.model.MyWaifuModelV2
 import heaven.from.model.MyWaifuState
 import heaven.from.mywaifump.component.MyWaifuTopAppBar
-import heaven.from.mywaifump.component.sizeMedium
-import heaven.from.mywaifump.component.sizeSmall
+import heaven.from.mywaifump.constant.sizeMedium
+import heaven.from.mywaifump.constant.sizeSmall
 import heaven.from.mywaifump.composition_provider.LocalWindowSize
 import heaven.from.mywaifump.constant.WindowSize
 import heaven.from.mywaifump.layout.MyWaifuScaffold
@@ -96,7 +97,6 @@ import mywaifump.composeapp.generated.resources.picture
 import mywaifump.composeapp.generated.resources.settings
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun Dropdown(
@@ -198,16 +198,28 @@ fun SuccessItem(
     val imagePainterState by imagePainter.state.collectAsState()
     val interactionSource = remember { MutableInteractionSource() }
     var isLongPressed by remember { mutableStateOf(false) }
-    var imagePainterContainerOffset by remember { mutableStateOf(Offset.Zero) }
-    var peekImagePointerOffset by remember { mutableStateOf(Offset.Zero) }
-    var peekImageSize by remember { mutableStateOf(IntSize.Zero) }
-    val peekImageAnimationKeyframe = remember { Animatable(0f) }
-    var peekImageVisible by remember { mutableStateOf(false) }
 
+    // This mutable variable will be handled within a coroutine because a pop up's appearance is
+    // instant.
+    var popUpVisible by remember { mutableStateOf(false) }
+    // The offset of the composable component which receives pointerInput() modifier.
+    var pointerContainerOffset by remember { mutableStateOf(Offset.Zero) }
+    // Pointer offset relative to the above composable component's zero offset.
+    var pointerOffset by remember { mutableStateOf(Offset.Zero) }
+    // The size of the preview image within the pop up upon long press.
+    var peekImageSize by remember { mutableStateOf(IntSize.Zero) }
+    // The animation keyframe for the preview image within the pop up upon long press.
+    val peekImageAnimationKeyframe = remember { Animatable(0f) }
+
+    /**
+     * Upon entering, pop up must be visible first and then animation so that the preview image
+     * has a parent container. Upon exiting, animation first before disable the pop up visibility
+     * so that the preview image has that exiting animation. Pop up appearance/disappearance is
+     * instant.
+     */
     LaunchedEffect(isLongPressed) {
         if (isLongPressed) {
-            peekImageVisible = true
-
+            popUpVisible = true
             peekImageAnimationKeyframe.animateTo(
                 targetValue = 1f,
                 animationSpec = spring()
@@ -218,46 +230,46 @@ fun SuccessItem(
                 targetValue = 0f,
                 animationSpec = spring()
             )
-
-            peekImageVisible = false
+            popUpVisible = false
         }
     }
-    if (peekImageVisible) {
+    if (popUpVisible) {
+        val currentWindowWidth = LocalWindowInfo.current.containerSize.width
+        val currentWindowHeight = LocalWindowInfo.current.containerSize.height
+        var offsetX: Dp
+        var offsetY: Dp
+
+        with(LocalDensity.current) {
+            /**
+             * 1. Pointer offset + pointer container offset = pointer offset within the entire
+             *    window.
+             * 2. Subtract offset X with half of the preview image so that the image alignment is
+             *    horizontally centered relative to the pointer.
+             * 3. Subtract offset Y with the entire preview image height so that the image is
+             *    located at the top of the pointer.
+             * 4. Both this offset then used for the preview image offset for horizontally
+             *    centered preview image at the top of the pointer.
+             */
+            offsetX = (pointerOffset.x + pointerContainerOffset.x - (peekImageSize.width * 0.5f))
+                .coerceIn(
+                    minimumValue = 0.0f,
+                    maximumValue = (currentWindowWidth - peekImageSize.width).toFloat()
+                )
+                .toDp()
+            offsetY = (pointerOffset.y + pointerContainerOffset.y - peekImageSize.height - 100)
+                .coerceIn(
+                    minimumValue = 0.0f,
+                    maximumValue = (currentWindowHeight - peekImageSize.height).toFloat()
+                )
+                .toDp()
+        }
+
         Popup {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.Black.copy(0.4f))
             ) {
-                val currentWindowWidth = LocalWindowInfo.current.containerSize.width
-                val currentWindowHeight = LocalWindowInfo.current.containerSize.height
-                var offsetX: Dp
-                var offsetY: Dp
-
-                with(LocalDensity.current) {
-                    offsetX = (
-                        peekImagePointerOffset.x +
-                            imagePainterContainerOffset.x -
-                            (peekImageSize.width / 2)
-                        )
-                        .coerceIn(
-                            minimumValue = 0.0f,
-                            maximumValue = (currentWindowWidth - peekImageSize.width).toFloat()
-                        )
-                        .toDp()
-                    offsetY = (
-                        peekImagePointerOffset.y +
-                            imagePainterContainerOffset.y -
-                            peekImageSize.height -
-                            100
-                        )
-                        .coerceIn(
-                            minimumValue = 0.0f,
-                            maximumValue = (currentWindowHeight - peekImageSize.height).toFloat()
-                        )
-                        .toDp()
-                }
-
                 AsyncImage(
                     modifier = Modifier
                         .onGloballyPositioned { layoutCoordinates ->
@@ -289,7 +301,7 @@ fun SuccessItem(
         modifier = Modifier
             .clip(RoundedCornerShape(sizeMedium))
             .onGloballyPositioned { layoutCoordinates ->
-                imagePainterContainerOffset = layoutCoordinates.positionInWindow()
+                pointerContainerOffset = layoutCoordinates.positionInWindow()
             }
             .indication(
                 interactionSource = interactionSource,
@@ -313,7 +325,7 @@ fun SuccessItem(
                     },
                     onLongPress = { offset ->
                         isLongPressed = true
-                        peekImagePointerOffset = offset
+                        pointerOffset = offset
                     }
                 )
             },
