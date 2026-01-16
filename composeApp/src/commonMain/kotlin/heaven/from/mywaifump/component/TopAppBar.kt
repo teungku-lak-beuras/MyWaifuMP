@@ -1,7 +1,6 @@
 /**
- * This code contains nullable values that were thoroughly considered.
- * The nullable behaviour is internal to this code only, safe to
- * outsider codes.
+ * This code contains nullable values that were thoroughly considered. The nullable behaviour is
+ * internal and shan't be used/handled by outsider codes.
  *
  * (c) 2025 ZeEFS. All rights reserved.
  */
@@ -18,7 +17,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -27,10 +28,18 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import heaven.from.mywaifump.constant.shape
@@ -46,9 +55,6 @@ import mywaifump.composeapp.generated.resources.menu_burger
 import mywaifump.composeapp.generated.resources.search
 import org.jetbrains.compose.resources.painterResource
 
-/**
- * Muvara.
- */
 @Composable
 private fun MyWaifuMPTopAppBar(
     title: String,
@@ -91,10 +97,11 @@ private fun MyWaifuMPTopAppBar(
 private fun MyWaifuMPTopAppBar(
     title: String,
     leadingTitle: String?,
+    searchState: TextFieldState?,
     expanded: Boolean,
     expandedCallback: (() -> Unit)?,
     notificationCallback: (() -> Unit)?,
-    searchCallback: ((String) -> Unit)?,
+    searchCallback: (() -> Unit)?,
     burgerCallback: (() -> Unit)?,
     burgerContent: (@Composable () -> Unit)?
 ) {
@@ -171,24 +178,52 @@ private fun MyWaifuMPTopAppBar(
                         )
                     }
                 }
-                // DO NOT simply. Sometimes more is more.
+                // DO NOT simplify. Consistencies matter.
                 if (burgerContent != null) {
                     burgerContent.invoke()
                 }
             }
             // --- --- --- Second row --- --- ---
-            if (searchCallback != null) {
+            if (searchCallback != null && searchState != null) {
                 Row(
                     modifier = Modifier
                         .padding(top = sizeMedium)
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    val primaryColor = MaterialTheme.colorScheme.primaryContainer
+                    val secondaryColor = MaterialTheme.colorScheme.secondaryContainer
+                    val tertiaryColor = MaterialTheme.colorScheme.tertiaryContainer
+                    val textFieldTextStyle = remember {
+                        Brush.linearGradient(
+                            colors = listOf(
+                                primaryColor,
+                                secondaryColor,
+                                tertiaryColor
+                            )
+                        )
+                    }
+
                     TextField(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(topAppBarMenuSize)
-                            .clip(RoundedCornerShape(sizeMedium)),
+                            .clip(RoundedCornerShape(sizeMedium))
+                            .onKeyEvent { keyEvent ->
+                                /**
+                                 * If key is released (KeyUp) and the key is Enter key, do something
+                                 * and return true to consume this event. Else, return false to
+                                 * yield this event to somewhere else (propagate).
+                                 */
+                                if (keyEvent.type == KeyEventType.KeyUp &&
+                                    keyEvent.key == Key.Enter) {
+                                    searchCallback.invoke()
+                                    true
+                                }
+                                else {
+                                    false
+                                }
+                            },
                         contentPadding = PaddingValues(
                             start = sizeMedium,
                             end = sizeMedium
@@ -209,8 +244,15 @@ private fun MyWaifuMPTopAppBar(
                         placeholder = {
                             Text("Search...")
                         },
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(
+                            brush = textFieldTextStyle
+                        ),
                         lineLimits = TextFieldLineLimits.SingleLine,
-                        state = rememberTextFieldState()
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Search
+                        ),
+                        onKeyboardAction = { searchCallback.invoke() },
+                        state = searchState,
                     )
                 }
             }
@@ -224,15 +266,17 @@ private fun MyWaifuMPTopAppBar(
 @Composable
 fun MyWaifuTopAppBar(
     title: String,
+    searchState: TextFieldState,
     collapseCallback: () -> Unit,
     notificationCallback: () -> Unit,
     burgerCallback: () -> Unit,
-    searchCallback: (String) -> Unit,
+    searchCallback: () -> Unit,
     burgerContent: @Composable () -> Unit
 ) {
     MyWaifuMPTopAppBar(
         title = title,
         leadingTitle = null,
+        searchState = searchState,
         expanded = true,
         expandedCallback = collapseCallback,
         notificationCallback = notificationCallback,
@@ -248,16 +292,18 @@ fun MyWaifuTopAppBar(
 @Composable
 fun MyWaifuTopAppBar(
     title: String,
+    searchState: TextFieldState,
     leadingTitle: String,
     collapseCallback: () -> Unit,
     notificationCallback: () -> Unit,
     burgerCallback: () -> Unit,
-    searchCallback: (String) -> Unit,
+    searchCallback: () -> Unit,
     burgerContent: @Composable () -> Unit
 ) {
     MyWaifuMPTopAppBar(
         title = title,
         leadingTitle = leadingTitle,
+        searchState = searchState,
         expanded = true,
         expandedCallback = collapseCallback,
         notificationCallback = notificationCallback,
@@ -281,6 +327,7 @@ fun MyWaifuTopAppBar(
     MyWaifuMPTopAppBar(
         title = title,
         leadingTitle = null,
+        searchState = null,
         expanded = false,
         expandedCallback = expandCallback,
         notificationCallback = notificationCallback,
@@ -305,6 +352,7 @@ fun MyWaifuTopAppBar(
     MyWaifuMPTopAppBar(
         title = title,
         leadingTitle = leadingTitle,
+        searchState = null,
         expanded = false,
         expandedCallback = expandCallback,
         notificationCallback = notificationCallback,
@@ -336,6 +384,7 @@ fun MyWaifuTopAppBarPreview1() {
     MyWaifuPreview {
         MyWaifuTopAppBar(
             title = "Administrator",
+            searchState = rememberTextFieldState(),
             collapseCallback = {},
             notificationCallback = {},
             searchCallback = {},
@@ -354,6 +403,7 @@ fun MyWaifuTopAppBarPreview2() {
         MyWaifuTopAppBar(
             title = "Administrator",
             leadingTitle = "Welcome",
+            searchState = rememberTextFieldState(),
             collapseCallback = {},
             notificationCallback = {},
             searchCallback = {},

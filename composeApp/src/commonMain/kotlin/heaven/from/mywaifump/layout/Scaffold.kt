@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -71,6 +72,7 @@ fun MyWaifuScaffoldPreview1() {
                 MyWaifuTopAppBar(
                     title = "Administrator",
                     leadingTitle = "Welcome",
+                    searchState = rememberTextFieldState(),
                     collapseCallback = {},
                     notificationCallback = {},
                     burgerCallback = {},

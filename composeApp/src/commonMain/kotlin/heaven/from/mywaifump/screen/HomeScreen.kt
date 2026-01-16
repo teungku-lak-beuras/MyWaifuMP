@@ -29,6 +29,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -44,6 +45,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -72,18 +74,21 @@ import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import heaven.from.model.MyWaifuModelV2
 import heaven.from.model.MyWaifuState
+import heaven.from.mywaifump.component.MyWaifuSnackBar
 import heaven.from.mywaifump.component.MyWaifuTopAppBar
-import heaven.from.mywaifump.constant.sizeMedium
-import heaven.from.mywaifump.constant.sizeSmall
 import heaven.from.mywaifump.composition_provider.LocalWindowSize
 import heaven.from.mywaifump.constant.WindowSize
+import heaven.from.mywaifump.constant.sizeMedium
+import heaven.from.mywaifump.constant.sizeSmall
 import heaven.from.mywaifump.layout.MyWaifuScaffold
 import heaven.from.mywaifump.layout.MyWaifuSwitchingTopAppBar
 import heaven.from.mywaifump.utility.MyWaifuPreview
 import heaven.from.mywaifump.utility.plus
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
 import mywaifump.composeapp.generated.resources.Res
 import mywaifump.composeapp.generated.resources.about
 import mywaifump.composeapp.generated.resources.app_name
@@ -515,9 +520,11 @@ fun HomeScreen(
     aboutCallback: () -> Unit,
     loadMoreCallback: () -> Unit
 ) {
-    val windowSizeClass = LocalWindowSize.current
+    val searchState = rememberTextFieldState()
+    var searchSnackBarVisible by remember { mutableStateOf(false) }
     var topAppBarExpanded by remember { mutableStateOf(true) }
     var dropdownExpanded by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
     val dropdown = @Composable {
         AnimatedVisibility(
             visible = dropdownExpanded,
@@ -533,83 +540,63 @@ fun HomeScreen(
             )
         }
     }
+    val searchSnackbar = @Composable {
+        MyWaifuSnackBar(
+            isIndefinitelyDuration = null,
+            message = searchState.text.toString()
+        )
+    }
 
-    when (windowSizeClass) {
-        WindowSize.Medium -> {
-            MyWaifuScaffold(
-                topAppBar = {
-                    MyWaifuSwitchingTopAppBar(
-                        expanded = topAppBarExpanded,
-                        expandedTopAppBar = {
-                            MyWaifuTopAppBar(
-                                title = stringResource(Res.string.app_name),
-                                collapseCallback = { topAppBarExpanded = false },
-                                notificationCallback = {},
-                                searchCallback = { text -> },
-                                burgerCallback = { dropdownExpanded = true },
-                                burgerContent = dropdown
-                            )
+    MyWaifuScaffold(
+        topAppBar = {
+            MyWaifuSwitchingTopAppBar(
+                expanded = topAppBarExpanded,
+                expandedTopAppBar = {
+                    MyWaifuTopAppBar(
+                        title = stringResource(Res.string.app_name),
+                        searchState = searchState,
+                        collapseCallback = { topAppBarExpanded = false },
+                        notificationCallback = {},
+                        searchCallback = {
+                            coroutineScope.launch {
+                                searchSnackBarVisible = true
+                                delay(5000)
+                                searchSnackBarVisible = false
+                            }
                         },
-                        collapsedTopAppBar = {
-                            MyWaifuTopAppBar(
-                                title = stringResource(Res.string.app_name),
-                                expandCallback = { topAppBarExpanded = true },
-                                notificationCallback = {},
-                                burgerCallback = { dropdownExpanded = true },
-                                burgerContent = dropdown
-                            )
-                        },
+                        burgerCallback = { dropdownExpanded = true },
+                        burgerContent = dropdown
                     )
-                }
-            ) { paddingValues ->
-                Content(
-                    paddingValues = paddingValues,
-                    waifu = waifu,
-                    isLoadingMore = isLoadingMore,
-                    isInitialyLoaded = isInitialyLoaded,
-                    loadMoreCallback = loadMoreCallback
-                )
-            }
-        }
-
-        else -> {
-            MyWaifuScaffold(
-                topAppBar = {
-                    MyWaifuSwitchingTopAppBar(
-                        expanded = topAppBarExpanded,
-                        expandedTopAppBar = {
-                            MyWaifuTopAppBar(
-                                title = stringResource(Res.string.app_name),
-                                collapseCallback = { topAppBarExpanded = false },
-                                notificationCallback = {},
-                                searchCallback = { text -> },
-                                burgerCallback = { dropdownExpanded = true },
-                                burgerContent = dropdown
-                            )
-                        },
-                        collapsedTopAppBar = {
-                            MyWaifuTopAppBar(
-                                title = stringResource(Res.string.app_name),
-                                expandCallback = { topAppBarExpanded = true },
-                                notificationCallback = {},
-                                burgerCallback = { dropdownExpanded = true },
-                                burgerContent = {
-
-                                }
-                            )
-                        }
+                },
+                collapsedTopAppBar = {
+                    MyWaifuTopAppBar(
+                        title = stringResource(Res.string.app_name),
+                        expandCallback = { topAppBarExpanded = true },
+                        notificationCallback = {},
+                        burgerCallback = { dropdownExpanded = true },
+                        burgerContent = dropdown
                     )
-                }
-            ) { paddingValues ->
-                Content(
-                    paddingValues = paddingValues,
-                    waifu = waifu,
-                    isLoadingMore = isLoadingMore,
-                    isInitialyLoaded = isInitialyLoaded,
-                    loadMoreCallback = loadMoreCallback
-                )
-            }
+                },
+            )
         }
+    ) { paddingValues ->
+        Content(
+            paddingValues = paddingValues,
+            waifu = waifu,
+            isLoadingMore = isLoadingMore,
+            isInitialyLoaded = isInitialyLoaded,
+            loadMoreCallback = loadMoreCallback
+        )
+        if (searchSnackBarVisible) {
+            searchSnackbar()
+        }
+    }
+
+    /**
+     * Support for different window size will be added later.
+     */
+    when (LocalWindowSize.current) {
+        else -> {}
     }
 }
 
