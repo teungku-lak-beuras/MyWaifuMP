@@ -14,7 +14,10 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
+import heaven.from.mywaifump.route.AboutRoute
+import heaven.from.mywaifump.route.HelpRoute
 import heaven.from.mywaifump.route.HomeRoute
+import heaven.from.mywaifump.route.SettingsRoute
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 
@@ -24,7 +27,7 @@ private const val opacityAlpha = 0.4f
 
 @Composable
 fun MyWaifuNavigation() {
-    val backStack = rememberNavBackStack(
+    val backstack = rememberNavBackStack(
         configuration = SavedStateConfiguration {
             serializersModule = SerializersModule {
                 polymorphic(NavKey::class) {
@@ -51,7 +54,7 @@ fun MyWaifuNavigation() {
     )
 
     NavDisplay(
-        backStack = backStack,
+        backStack = backstack,
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator()
@@ -97,9 +100,36 @@ fun MyWaifuNavigation() {
         entryProvider = entryProvider {
             entry<MyWaifuRoutes.HomeRoute> {
                 HomeRoute(
-                    helpCallback = {},
-                    settingsCallback = {},
-                    aboutCallback = {}
+                    helpCallback = {
+                        backstack.add(MyWaifuRoutes.HelpScreen)
+                    },
+                    settingsCallback = {
+                        backstack.add(MyWaifuRoutes.SettingsScreen)
+                    },
+                    aboutCallback = {
+                        backstack.add(MyWaifuRoutes.AboutScreen)
+                    }
+                )
+            }
+            entry<MyWaifuRoutes.HelpScreen> {
+                HelpRoute(
+                    popCallback = {
+                        backstack.remove(MyWaifuRoutes.HelpScreen)
+                    }
+                )
+            }
+            entry<MyWaifuRoutes.SettingsScreen> {
+                SettingsRoute(
+                    popCallback = {
+                        backstack.remove(MyWaifuRoutes.SettingsScreen)
+                    }
+                )
+            }
+            entry<MyWaifuRoutes.AboutScreen> {
+                AboutRoute(
+                    popCallback = {
+                        backstack.remove(MyWaifuRoutes.AboutScreen)
+                    }
                 )
             }
         }

@@ -22,6 +22,10 @@ class CmpConventionPlugin : Plugin<Project> {
             extensions.configure<KotlinMultiplatformExtension> {
                 configureComposeMultiplatform(this)
             }
+
+            dependencies {
+                add("debugImplementation", libs.findLibrary("compose.ui.tooling").get().get())
+            }
         }
     }
 }

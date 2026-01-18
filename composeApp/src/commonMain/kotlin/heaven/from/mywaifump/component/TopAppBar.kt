@@ -68,7 +68,7 @@ private fun MyWaifuMPTopAppBar(
     ) {
         Row(
             modifier = Modifier.padding(sizeMedium),
-            horizontalArrangement = Arrangement.SpaceAround,
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             TopAppBarMenu(

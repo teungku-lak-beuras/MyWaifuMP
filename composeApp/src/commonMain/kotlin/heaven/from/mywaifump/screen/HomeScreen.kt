@@ -45,7 +45,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -74,7 +73,6 @@ import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import heaven.from.model.MyWaifuModelV2
 import heaven.from.model.MyWaifuState
-import heaven.from.mywaifump.component.MyWaifuSnackBar
 import heaven.from.mywaifump.component.MyWaifuTopAppBar
 import heaven.from.mywaifump.composition_provider.LocalWindowSize
 import heaven.from.mywaifump.constant.WindowSize
@@ -84,11 +82,9 @@ import heaven.from.mywaifump.layout.MyWaifuScaffold
 import heaven.from.mywaifump.layout.MyWaifuSwitchingTopAppBar
 import heaven.from.mywaifump.utility.MyWaifuPreview
 import heaven.from.mywaifump.utility.plus
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.launch
 import mywaifump.composeapp.generated.resources.Res
 import mywaifump.composeapp.generated.resources.about
 import mywaifump.composeapp.generated.resources.app_name
@@ -521,10 +517,8 @@ fun HomeScreen(
     loadMoreCallback: () -> Unit
 ) {
     val searchState = rememberTextFieldState()
-    var searchSnackBarVisible by remember { mutableStateOf(false) }
     var topAppBarExpanded by remember { mutableStateOf(true) }
     var dropdownExpanded by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
     val dropdown = @Composable {
         AnimatedVisibility(
             visible = dropdownExpanded,
@@ -534,17 +528,20 @@ fun HomeScreen(
             Dropdown(
                 expanded = dropdownExpanded,
                 onDismissRequest = { dropdownExpanded = false },
-                helpCallback = { dropdownExpanded = false },
-                settingsCallback = { dropdownExpanded = false },
-                aboutCallback = { dropdownExpanded = false },
+                helpCallback = {
+                    dropdownExpanded = false
+                    helpCallback.invoke()
+                },
+                settingsCallback = {
+                    dropdownExpanded = false
+                    settingsCallback.invoke()
+                },
+                aboutCallback = {
+                    dropdownExpanded = false
+                    aboutCallback.invoke()
+                },
             )
         }
-    }
-    val searchSnackbar = @Composable {
-        MyWaifuSnackBar(
-            isIndefinitelyDuration = null,
-            message = searchState.text.toString()
-        )
     }
 
     MyWaifuScaffold(
@@ -557,13 +554,7 @@ fun HomeScreen(
                         searchState = searchState,
                         collapseCallback = { topAppBarExpanded = false },
                         notificationCallback = {},
-                        searchCallback = {
-                            coroutineScope.launch {
-                                searchSnackBarVisible = true
-                                delay(5000)
-                                searchSnackBarVisible = false
-                            }
-                        },
+                        searchCallback = {},
                         burgerCallback = { dropdownExpanded = true },
                         burgerContent = dropdown
                     )
@@ -587,9 +578,6 @@ fun HomeScreen(
             isInitialyLoaded = isInitialyLoaded,
             loadMoreCallback = loadMoreCallback
         )
-        if (searchSnackBarVisible) {
-            searchSnackbar()
-        }
     }
 
     /**
