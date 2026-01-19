@@ -25,10 +25,9 @@ fun Project.configureComposeMultiplatform(
                 implementation(libs.findLibrary("androidx.lifecycle.viewmodel").get())
                 implementation(libs.findLibrary("androidx.lifecycle.viewmodel.compose").get())
 
-                // --- Navigation 3 with KotlinX JSON serialization ---
+                // --- Navigation 3 ---
                 implementation(libs.findLibrary("androidx.lifecycle.viewmodel.navigation3").get())
                 implementation(libs.findLibrary("androidx.navigation3.ui").get())
-                implementation(libs.findLibrary("kotlin.serialization.json").get())
 
                 // --- Window size class ---
                 implementation(libs.findLibrary("compose.material.windowsize").get())

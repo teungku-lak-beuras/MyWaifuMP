@@ -15,6 +15,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import heaven.from.mywaifump.route.AboutRoute
+import heaven.from.mywaifump.route.DetailRoute
 import heaven.from.mywaifump.route.HelpRoute
 import heaven.from.mywaifump.route.HomeRoute
 import heaven.from.mywaifump.route.SettingsRoute
@@ -36,16 +37,20 @@ fun MyWaifuNavigation() {
                         MyWaifuRoutes.HomeRoute.serializer()
                     )
                     subclass(
-                        MyWaifuRoutes.HelpScreen::class,
-                        MyWaifuRoutes.HelpScreen.serializer()
+                        MyWaifuRoutes.DetailRoute::class,
+                        MyWaifuRoutes.DetailRoute.serializer()
                     )
                     subclass(
-                        MyWaifuRoutes.SettingsScreen::class,
-                        MyWaifuRoutes.SettingsScreen.serializer()
+                        MyWaifuRoutes.HelpRoute::class,
+                        MyWaifuRoutes.HelpRoute.serializer()
                     )
                     subclass(
-                        MyWaifuRoutes.AboutScreen::class,
-                        MyWaifuRoutes.AboutScreen.serializer()
+                        MyWaifuRoutes.SettingsRoute::class,
+                        MyWaifuRoutes.SettingsRoute.serializer()
+                    )
+                    subclass(
+                        MyWaifuRoutes.AboutRoute::class,
+                        MyWaifuRoutes.AboutRoute.serializer()
                     )
                 }
             }
@@ -101,34 +106,45 @@ fun MyWaifuNavigation() {
             entry<MyWaifuRoutes.HomeRoute> {
                 HomeRoute(
                     helpCallback = {
-                        backstack.add(MyWaifuRoutes.HelpScreen)
+                        backstack.add(MyWaifuRoutes.HelpRoute)
                     },
                     settingsCallback = {
-                        backstack.add(MyWaifuRoutes.SettingsScreen)
+                        backstack.add(MyWaifuRoutes.SettingsRoute)
                     },
                     aboutCallback = {
-                        backstack.add(MyWaifuRoutes.AboutScreen)
+                        backstack.add(MyWaifuRoutes.AboutRoute)
+                    },
+                    detailCallback = { waifu ->
+                        backstack.add(MyWaifuRoutes.DetailRoute(waifu))
                     }
                 )
             }
-            entry<MyWaifuRoutes.HelpScreen> {
+            entry<MyWaifuRoutes.DetailRoute> { navKey ->
+                DetailRoute(
+                    waifu = navKey.waifu,
+                    popCallback = {
+                        backstack.remove(navKey)
+                    }
+                )
+            }
+            entry<MyWaifuRoutes.HelpRoute> { navKey ->
                 HelpRoute(
                     popCallback = {
-                        backstack.remove(MyWaifuRoutes.HelpScreen)
+                        backstack.remove(navKey)
                     }
                 )
             }
-            entry<MyWaifuRoutes.SettingsScreen> {
+            entry<MyWaifuRoutes.SettingsRoute> { navKey ->
                 SettingsRoute(
                     popCallback = {
-                        backstack.remove(MyWaifuRoutes.SettingsScreen)
+                        backstack.remove(navKey)
                     }
                 )
             }
-            entry<MyWaifuRoutes.AboutScreen> {
+            entry<MyWaifuRoutes.AboutRoute> { navKey ->
                 AboutRoute(
                     popCallback = {
-                        backstack.remove(MyWaifuRoutes.AboutScreen)
+                        backstack.remove(navKey)
                     }
                 )
             }

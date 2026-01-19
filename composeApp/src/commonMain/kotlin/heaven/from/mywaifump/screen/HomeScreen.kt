@@ -108,7 +108,7 @@ fun Dropdown(
     aboutCallback: () -> Unit
 ) {
     DropdownMenu(
-        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+        containerColor = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(sizeMedium),
         expanded = expanded,
         onDismissRequest = onDismissRequest
@@ -185,7 +185,8 @@ fun LoadingItem() {
 
 @Composable
 fun SuccessItem(
-    waifu: MyWaifuModelV2
+    waifu: MyWaifuModelV2,
+    detailCallback: (MyWaifuModelV2) -> Unit,
 ) {
     val imageRequest = ImageRequest
         .Builder(LocalPlatformContext.current)
@@ -327,6 +328,9 @@ fun SuccessItem(
                     onLongPress = { offset ->
                         isLongPressed = true
                         pointerOffset = offset
+                    },
+                    onTap = {
+                        detailCallback.invoke(waifu)
                     }
                 )
             },
@@ -411,7 +415,8 @@ fun Content(
     isLoadingMore: Boolean,
     isInitialyLoaded: Boolean,
     waifu: MyWaifuState<List<MyWaifuModelV2>>,
-    loadMoreCallback: () -> Unit
+    loadMoreCallback: () -> Unit,
+    detailCallback: (MyWaifuModelV2) -> Unit
 ) {
     val state = rememberLazyGridState()
 
@@ -477,7 +482,10 @@ fun Content(
                     key = { it.id },
                     items = waifu.data
                 ) { item ->
-                    SuccessItem(waifu = item)
+                    SuccessItem(
+                        waifu = item,
+                        detailCallback = detailCallback
+                    )
                 }
                 if (isLoadingMore) {
                     item(
@@ -514,7 +522,8 @@ fun HomeScreen(
     helpCallback: () -> Unit,
     settingsCallback: () -> Unit,
     aboutCallback: () -> Unit,
-    loadMoreCallback: () -> Unit
+    loadMoreCallback: () -> Unit,
+    detailCallback: (MyWaifuModelV2) -> Unit
 ) {
     val searchState = rememberTextFieldState()
     var topAppBarExpanded by remember { mutableStateOf(true) }
@@ -576,7 +585,8 @@ fun HomeScreen(
             waifu = waifu,
             isLoadingMore = isLoadingMore,
             isInitialyLoaded = isInitialyLoaded,
-            loadMoreCallback = loadMoreCallback
+            loadMoreCallback = loadMoreCallback,
+            detailCallback = detailCallback
         )
     }
 
@@ -623,7 +633,8 @@ fun HomeScreenPreview1() {
             helpCallback = {},
             settingsCallback = {},
             aboutCallback = {},
-            loadMoreCallback = {}
+            loadMoreCallback = {},
+            detailCallback = {}
         )
     }
 }
@@ -643,7 +654,8 @@ fun HomeScreenPreview2() {
             helpCallback = {},
             settingsCallback = {},
             aboutCallback = {},
-            loadMoreCallback = {}
+            loadMoreCallback = {},
+            detailCallback = {}
         )
     }
 }

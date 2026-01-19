@@ -45,6 +45,7 @@ fun Project.configureKotlinMultiplatform(kmpExtension: KotlinMultiplatformExtens
 
             commonMain.dependencies {
                 implementation(libs.findLibrary("napier").get())
+                implementation(libs.findLibrary("kotlin.serialization.json").get())
             }
 
             commonTest.dependencies {

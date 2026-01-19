@@ -3,6 +3,7 @@ package heaven.from.mywaifump.route
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
+import heaven.from.model.MyWaifuModelV2
 import heaven.from.mywaifump.provider.MyWaifuRepositoryProvider
 import heaven.from.mywaifump.screen.HomeScreen
 import heaven.from.mywaifump.viewmodel.HomeViewModel
@@ -11,7 +12,8 @@ import heaven.from.mywaifump.viewmodel.HomeViewModel
 fun HomeRoute(
     helpCallback: () -> Unit,
     settingsCallback: () -> Unit,
-    aboutCallback: () -> Unit
+    aboutCallback: () -> Unit,
+    detailCallback: (MyWaifuModelV2) -> Unit
 ) {
     val viewModel = viewModel {
         HomeViewModel(MyWaifuRepositoryProvider.provideCachedRepository())
@@ -24,6 +26,7 @@ fun HomeRoute(
         helpCallback = helpCallback,
         settingsCallback = settingsCallback,
         aboutCallback = aboutCallback,
-        loadMoreCallback = { viewModel.getMoreNekosiaCatWaifu() }
+        loadMoreCallback = { viewModel.getMoreNekosiaCatWaifu() },
+        detailCallback = detailCallback
     )
 }

@@ -1,8 +1,10 @@
 package heaven.from.model
 
+import kotlinx.serialization.Serializable
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
+@Serializable
 data class MyWaifuModelV2
 @OptIn(ExperimentalUuidApi::class)
 constructor(

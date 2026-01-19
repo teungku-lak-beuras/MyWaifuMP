@@ -1,6 +1,7 @@
 package heaven.from.mywaifump.navigation
 
 import androidx.navigation3.runtime.NavKey
+import heaven.from.model.MyWaifuModelV2
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -9,11 +10,14 @@ sealed interface MyWaifuRoutes : NavKey {
     data object HomeRoute : MyWaifuRoutes, NavKey
 
     @Serializable
-    data object HelpScreen : MyWaifuRoutes, NavKey
+    data class DetailRoute(val waifu: MyWaifuModelV2) : MyWaifuRoutes, NavKey
 
     @Serializable
-    data object SettingsScreen : MyWaifuRoutes, NavKey
+    data object HelpRoute : MyWaifuRoutes, NavKey
 
     @Serializable
-    data object AboutScreen : MyWaifuRoutes, NavKey
+    data object SettingsRoute : MyWaifuRoutes, NavKey
+
+    @Serializable
+    data object AboutRoute : MyWaifuRoutes, NavKey
 }
