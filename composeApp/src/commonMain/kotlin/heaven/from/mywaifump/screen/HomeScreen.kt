@@ -655,3 +655,13 @@ fun TabletPreview() {
         HomeScreenPreview()
     }
 }
+
+@Preview(device = Devices.DESKTOP)
+@Composable
+fun DesktopPreview() {
+    MyWaifuPreview(
+        windowSize = WindowSize.Expanded
+    ) {
+        HomeScreenPreview()
+    }
+}
