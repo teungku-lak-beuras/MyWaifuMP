@@ -56,7 +56,11 @@ fun DetailScreen(
             AsyncImage(
                 modifier = Modifier
                     .padding(paddingValues)
-                    .padding(top = sizeMedium)
+                    .padding(
+                        top = sizeMedium,
+                        start = sizeMedium,
+                        end = sizeMedium
+                    )
                     .align(Alignment.CenterHorizontally)
                     .border(
                         width = 1.dp,
