@@ -640,7 +640,7 @@ fun HomeScreenPreview() {
 
 @Preview
 @Composable
-fun AndroidPreview() {
+fun HomeScreenAndroidPreview() {
     MyWaifuPreview {
         HomeScreenPreview()
     }
@@ -648,7 +648,7 @@ fun AndroidPreview() {
 
 @Preview(device = Devices.TABLET)
 @Composable
-fun TabletPreview() {
+fun HomeScreenTabletPreview() {
     MyWaifuPreview(
         windowSize = WindowSize.Medium
     ) {
@@ -658,7 +658,7 @@ fun TabletPreview() {
 
 @Preview(device = Devices.DESKTOP)
 @Composable
-fun DesktopPreview() {
+fun HomeScreenDesktopPreview() {
     MyWaifuPreview(
         windowSize = WindowSize.Expanded
     ) {

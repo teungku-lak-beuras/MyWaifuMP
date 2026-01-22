@@ -9,4 +9,33 @@
     <!-- States -->
     <string name="loading">Loading</string>
     <string name="error">Error</string>
+
+    <!--
+        About screen related.
+
+        Watchout for text structure! Each character, including but not limited to tab, and space,
+        will be rendered on the screen.
+     -->
+    <string name="nekos_best_api">Nekos Best API</string>
+    <string name="nekos_best_api_website_image">Nekos Best API website image</string>
+    <string name="nekosia_cat_api">Nekosia Cat API</string>
+    <string name="nekosia_cat_api_website_image">Nekosia Cat API website image</string>
+    <string name="about_1">This application is MyWaifuMP (MP for Multi-Platform). The aim of this project is to hunt for waifus, from any platform. :)
+
+The application is getting more stable each commit and one day, I hope that this project will help someone out there learning Compose and/or Kotlin Multi-Platform. But, since I don't have Apple products (iPhone and Macintosh, and I'll likely never have one), I decided to exclude those platforms from this project's target.
+
+I also learnt a lot when implementing this project. So, one day, when I decide to move-on to other more interesting project, I'll have a very solid understanding. I will never archive this project at my GitHub repository. This project is my pride and my first experience. The previous project (the Android version) is an exception because I migrated all of the code bases from there to this project.
+
+This project is open-source. You can see the source code and modify it by yourself! :)</string>
+    <string name="about_2">This API is the first API used for this project, and the project before (the Android version). This API is very good, never down (unless the Cloudflare is down), response time is very low, no limitation, lots, lots of beautiful waifus, and very consistent.
+
+The only limitation of this API is that, there's currently no support for compressed images. This makes loading images in the home screen take a really long time. Anything else? Nothing. This API is the best so far. I love it."</string>
+    <string name="about_3">This API is the second API which I considered using. It has almost all of the benefits from Nekos Best API (above) plus support for compressed images.
+
+The only limitation of this API is that there are limitations for API and image CDN requests. This is perfectly valid nothing to blame. But, this makes me a little nervous when scrolling while using the app, because based current limitation at the writing of this text is that, maximum request allowed is around 1 per second for the API and around 2-5 per second for image CDN request.
+
+Another thing is that most of the waifus are lollis. Looking at lolli anime girl while searching for a waifu makes me a bit nervous. But, this is subjective and has nothing to do with the API itself. The owner(s) deserve(s) full rights for his/her/their API.
+
+Overall, this API is the best. Super low latency, and gives me a very familiar experiences with Nekos Best API (above)."</string>
+    <string name="about_4">I don't accept donations, and I will never accept those. If you want to help me, hire me instead. Other than that, I thank you very much for your good intention. :)</string>
 </resources>
