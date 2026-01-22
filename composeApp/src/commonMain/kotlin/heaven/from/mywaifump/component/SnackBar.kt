@@ -23,14 +23,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import heaven.from.mywaifump.constant.sizeMedium
+import heaven.from.mywaifump.constant.sizeAppBarMenu
 import heaven.from.mywaifump.constant.sizeSmall
 import heaven.from.mywaifump.constant.sizeSmaller
-import heaven.from.mywaifump.constant.topAppBarMenuSize
 
 /**
  * @param isIndefinitelyDuration either null for short, false for long, and true for indefinitely.
@@ -68,7 +67,7 @@ fun MyWaifuSnackBar(
             Surface(
                 modifier = Modifier
                     .padding(sizeMedium)
-                    .height(topAppBarMenuSize)
+                    .height(sizeAppBarMenu)
                     .fillMaxWidth()
                     .align(alignment)
                     .dropShadow(

@@ -42,18 +42,29 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import heaven.from.mywaifump.constant.shape
+import heaven.from.mywaifump.constant.sizeLarger
 import heaven.from.mywaifump.constant.sizeMedium
-import heaven.from.mywaifump.constant.topAppBarMenuSize
+import heaven.from.mywaifump.constant.sizeAppBarMenu
 import heaven.from.mywaifump.utility.MyWaifuPreview
 import mywaifump.composeapp.generated.resources.Res
 import mywaifump.composeapp.generated.resources.arrow_small_left
+import mywaifump.composeapp.generated.resources.back
 import mywaifump.composeapp.generated.resources.bell
 import mywaifump.composeapp.generated.resources.caret_down
 import mywaifump.composeapp.generated.resources.caret_up
+import mywaifump.composeapp.generated.resources.collapse
+import mywaifump.composeapp.generated.resources.expand
 import mywaifump.composeapp.generated.resources.menu_burger
+import mywaifump.composeapp.generated.resources.more_menu
+import mywaifump.composeapp.generated.resources.notification
 import mywaifump.composeapp.generated.resources.search
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+
+private val shape = RoundedCornerShape(
+    bottomStart = sizeLarger,
+    bottomEnd = sizeLarger,
+)
 
 @Composable
 private fun MyWaifuMPTopAppBar(
@@ -71,12 +82,12 @@ private fun MyWaifuMPTopAppBar(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TopAppBarMenu(
+            MyWaifuAppBarMenu(
                 isTheLastMenu = false,
                 onClickCallback = popCallback
             ) {
                 Icon(
-                    contentDescription = "Notifications",
+                    contentDescription = stringResource(Res.string.back),
                     painter = painterResource(Res.drawable.arrow_small_left)
                 )
             }
@@ -87,7 +98,7 @@ private fun MyWaifuMPTopAppBar(
             )
             // Replace this ghost layout later with your preferred menu.
             Box(
-                modifier = Modifier.size(topAppBarMenuSize)
+                modifier = Modifier.size(sizeAppBarMenu)
             ) {}
         }
     }
@@ -123,7 +134,7 @@ private fun MyWaifuMPTopAppBar(
                 // --- --- --- --- Title container --- --- --- ---
                 Column(
                     modifier = Modifier
-                        .height(topAppBarMenuSize)
+                        .height(sizeAppBarMenu)
                         .weight(3f),
                     verticalArrangement = Arrangement.Center
                 ) {
@@ -140,12 +151,19 @@ private fun MyWaifuMPTopAppBar(
                 }
                 // --- --- --- --- Menus --- --- --- ---
                 if (expandedCallback != null) {
-                    TopAppBarMenu(
+                    MyWaifuAppBarMenu(
                         isTheLastMenu = false,
                         onClickCallback = expandedCallback
                     ) {
                         Icon(
-                            contentDescription = "Notifications",
+                            contentDescription = stringResource(
+                                if (expanded) {
+                                    Res.string.expand
+                                }
+                                else {
+                                    Res.string.collapse
+                                }
+                            ),
                             painter = painterResource(
                                 if (expanded) {
                                     Res.drawable.caret_up
@@ -158,22 +176,22 @@ private fun MyWaifuMPTopAppBar(
                     }
                 }
                 if (notificationCallback != null) {
-                    TopAppBarMenu(
+                    MyWaifuAppBarMenu(
                         isTheLastMenu = false,
                         onClickCallback = notificationCallback
                     ) {
                         Icon(
-                            contentDescription = "Notifications",
+                            contentDescription = stringResource(Res.string.notification),
                             painter = painterResource(Res.drawable.bell)
                         )
                     }
                 }
                 if (burgerCallback != null) {
-                    TopAppBarMenu(
+                    MyWaifuAppBarMenu(
                         onClickCallback = burgerCallback
                     ) {
                         Icon(
-                            contentDescription = "Notifications",
+                            contentDescription = stringResource(Res.string.more_menu),
                             painter = painterResource(Res.drawable.menu_burger)
                         )
                     }
@@ -207,7 +225,7 @@ private fun MyWaifuMPTopAppBar(
                     TextField(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(topAppBarMenuSize)
+                            .height(sizeAppBarMenu)
                             .clip(RoundedCornerShape(sizeMedium))
                             .onKeyEvent { keyEvent ->
                                 /**
@@ -237,7 +255,7 @@ private fun MyWaifuMPTopAppBar(
                         trailingIcon = {
                             Icon(
                                 modifier = Modifier.padding(sizeMedium),
-                                contentDescription = "Search",
+                                contentDescription = stringResource(Res.string.search),
                                 painter = painterResource(Res.drawable.search)
                             )
                         },

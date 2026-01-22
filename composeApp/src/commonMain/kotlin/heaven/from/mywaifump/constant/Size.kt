@@ -7,3 +7,4 @@ val sizeSmall = 8.dp
 val sizeMedium = 16.dp
 val sizeLarge = 24.dp
 val sizeLarger = 32.dp
+val sizeAppBarMenu = 48.dp

@@ -12,12 +12,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import heaven.from.mywaifump.constant.sizeMedium
+import heaven.from.mywaifump.constant.sizeAppBarMenu
 import heaven.from.mywaifump.constant.sizeSmall
 import heaven.from.mywaifump.constant.sizeSmaller
-import heaven.from.mywaifump.constant.topAppBarMenuSize
 
 @Composable
-fun TopAppBarMenu(
+fun MyWaifuAppBarMenu(
     modifier: Modifier = Modifier,
     isTheLastMenu: Boolean = true,
     onClickCallback: () -> Unit,
@@ -33,7 +33,7 @@ fun TopAppBarMenu(
                     it
                 }
             }
-            .size(topAppBarMenuSize)
+            .size(sizeAppBarMenu)
             .clip(RoundedCornerShape(sizeMedium))
             .clickable(onClick = onClickCallback),
         color = MaterialTheme.colorScheme.surface
