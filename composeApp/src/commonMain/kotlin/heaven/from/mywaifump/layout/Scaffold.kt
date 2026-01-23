@@ -2,6 +2,7 @@ package heaven.from.mywaifump.layout
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,8 +22,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import heaven.from.mywaifump.component.MyWaifuSideAppBar
 import heaven.from.mywaifump.component.MyWaifuTopAppBar
+import heaven.from.mywaifump.constant.WindowSize
 import heaven.from.mywaifump.utility.MyWaifuPreview
 
 @Composable
@@ -61,32 +65,103 @@ fun MyWaifuScaffold(
     }
 }
 
+@Composable
+fun MyWaifuScaffold(
+    sideAppBar: @Composable () -> Unit,
+    content: @Composable () -> Unit
+) {
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.secondaryContainer
+    ) {
+        Surface(
+            modifier = Modifier
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .windowInsetsPadding(WindowInsets.displayCutout)
+                .windowInsetsPadding(WindowInsets.navigationBars),
+            color = MaterialTheme.colorScheme.surface
+        ) {
+            Row {
+                sideAppBar.invoke()
+                content.invoke()
+            }
+        }
+    }
+}
+
+@Composable
+fun MyWaifuPortraitScaffoldPreview() {
+    MyWaifuScaffold(
+        topAppBar = {
+            MyWaifuTopAppBar(
+                title = "Administrator",
+                leadingTitle = "Welcome",
+                searchState = rememberTextFieldState(),
+                collapseCallback = {},
+                notificationCallback = {},
+                burgerCallback = {},
+                searchCallback = {},
+                burgerContent = {}
+            )
+        },
+        content = { paddingValues ->
+            Text(
+                modifier = Modifier
+                    .padding(paddingValues),
+                text = "Hello world!"
+            )
+        }
+    )
+}
+
+@Composable
+fun MyWaifuLandscapeScaffoldPreview() {
+    MyWaifuScaffold(
+        sideAppBar = {
+            MyWaifuSideAppBar(
+                burgerCallback = {},
+                notificationCallback = {},
+                searchCallback = {},
+                burgerContent = {}
+            )
+        }
+    ) {
+        Text("content goes here")
+    }
+}
+
 @Preview(
-    name = "Default"
+    showSystemUi = true
 )
 @Composable
-fun MyWaifuScaffoldPreview1() {
+fun MyWaifuPortraitScaffoldAndroidPreview() {
     MyWaifuPreview {
-        MyWaifuScaffold(
-            topAppBar = {
-                MyWaifuTopAppBar(
-                    title = "Administrator",
-                    leadingTitle = "Welcome",
-                    searchState = rememberTextFieldState(),
-                    collapseCallback = {},
-                    notificationCallback = {},
-                    burgerCallback = {},
-                    searchCallback = {},
-                    burgerContent = {}
-                )
-            },
-            content = { paddingValues ->
-                Text(
-                    modifier = Modifier
-                        .padding(paddingValues),
-                    text = "Hello world!"
-                )
-            }
-        )
+        MyWaifuPortraitScaffoldPreview()
+    }
+}
+
+@Preview(
+    device = Devices.TABLET,
+    showSystemUi = true
+)
+@Composable
+fun MyWaifuPortraitScaffoldTabletPreview() {
+    MyWaifuPreview(
+        windowSize = WindowSize.Medium
+    ) {
+        MyWaifuLandscapeScaffoldPreview()
+    }
+}
+
+@Preview(
+    device = Devices.DESKTOP,
+    showSystemUi = true
+)
+@Composable
+fun MyWaifuPortraitScaffoldDesktopPreview() {
+    MyWaifuPreview(
+        windowSize = WindowSize.Expanded
+    ) {
+        MyWaifuPortraitScaffoldPreview()
     }
 }

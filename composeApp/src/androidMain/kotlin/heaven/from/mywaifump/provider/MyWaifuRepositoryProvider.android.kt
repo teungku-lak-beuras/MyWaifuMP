@@ -23,6 +23,7 @@ actual object MyWaifuRepositoryProvider {
     // Defined with MyLazyWaifu for caching so that there is no need to check for multiple
     // reinitialisation.
     private var myWaifuRepository = MyLazyWaifu<Context, MyWaifuRepository> { context ->
+        println("Creating database")
         // --- Network ---
         val engine = NekosBestApiProvider.provideEngine()
         val nekosBestApiDataSource = NekosBestApiDataSource(
@@ -61,7 +62,6 @@ actual object MyWaifuRepositoryProvider {
             nekosiaCatApiRepository = nekosiaCatApiRepository
         )
     }
-    val a get() = myWaifuRepository
 
     actual fun provideRepository(parameter: Any?): Flow<MyWaifuState<MyWaifuRepository>> {
         return flow {

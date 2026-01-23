@@ -75,6 +75,7 @@ import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import heaven.from.model.MyWaifuModelV2
 import heaven.from.model.MyWaifuState
+import heaven.from.mywaifump.component.MyWaifuSideAppBar
 import heaven.from.mywaifump.component.MyWaifuTopAppBar
 import heaven.from.mywaifump.composition_provider.LocalWindowSize
 import heaven.from.mywaifump.constant.WindowSize
@@ -555,48 +556,107 @@ fun HomeScreen(
         }
     }
 
-    MyWaifuScaffold(
-        topAppBar = {
-            MyWaifuSwitchingTopAppBar(
-                expanded = topAppBarExpanded,
-                expandedTopAppBar = {
-                    MyWaifuTopAppBar(
-                        title = stringResource(Res.string.app_name),
-                        searchState = searchState,
-                        collapseCallback = { topAppBarExpanded = false },
-                        notificationCallback = {},
-                        searchCallback = {},
-                        burgerCallback = { dropdownExpanded = true },
-                        burgerContent = dropdown
-                    )
-                },
-                collapsedTopAppBar = {
-                    MyWaifuTopAppBar(
-                        title = stringResource(Res.string.app_name),
-                        expandCallback = { topAppBarExpanded = true },
-                        notificationCallback = {},
-                        burgerCallback = { dropdownExpanded = true },
-                        burgerContent = dropdown
-                    )
-                },
-            )
-        }
-    ) { paddingValues ->
-        Content(
-            paddingValues = paddingValues,
-            waifu = waifu,
-            isLoadingMore = isLoadingMore,
-            isInitialyLoaded = isInitialyLoaded,
-            loadMoreCallback = loadMoreCallback,
-            detailCallback = detailCallback
-        )
-    }
-
     /**
      * Support for different window size will be added later.
      */
     when (LocalWindowSize.current) {
-        else -> {}
+        WindowSize.Compact -> {
+            MyWaifuScaffold(
+                topAppBar = {
+                    MyWaifuSwitchingTopAppBar(
+                        expanded = topAppBarExpanded,
+                        expandedTopAppBar = {
+                            MyWaifuTopAppBar(
+                                title = stringResource(Res.string.app_name),
+                                searchState = searchState,
+                                collapseCallback = { topAppBarExpanded = false },
+                                notificationCallback = {},
+                                searchCallback = {},
+                                burgerCallback = { dropdownExpanded = true },
+                                burgerContent = dropdown
+                            )
+                        },
+                        collapsedTopAppBar = {
+                            MyWaifuTopAppBar(
+                                title = stringResource(Res.string.app_name),
+                                expandCallback = { topAppBarExpanded = true },
+                                notificationCallback = {},
+                                burgerCallback = { dropdownExpanded = true },
+                                burgerContent = dropdown
+                            )
+                        },
+                    )
+                }
+            ) { paddingValues ->
+                Content(
+                    paddingValues = paddingValues,
+                    waifu = waifu,
+                    isLoadingMore = isLoadingMore,
+                    isInitialyLoaded = isInitialyLoaded,
+                    loadMoreCallback = loadMoreCallback,
+                    detailCallback = detailCallback
+                )
+            }
+        }
+        WindowSize.Medium -> {
+            MyWaifuScaffold(
+                sideAppBar = {
+                    MyWaifuSideAppBar(
+                        burgerCallback = { dropdownExpanded = true },
+                        notificationCallback = {},
+                        searchCallback = {},
+                        burgerContent = dropdown
+                    )
+                }
+            ) {
+                Content(
+                    paddingValues = PaddingValues(0.dp),
+                    waifu = waifu,
+                    isLoadingMore = isLoadingMore,
+                    isInitialyLoaded = isInitialyLoaded,
+                    loadMoreCallback = loadMoreCallback,
+                    detailCallback = detailCallback
+                )
+            }
+        }
+        WindowSize.Expanded -> {
+            MyWaifuScaffold(
+                topAppBar = {
+                    MyWaifuSwitchingTopAppBar(
+                        expanded = topAppBarExpanded,
+                        expandedTopAppBar = {
+                            MyWaifuTopAppBar(
+                                title = stringResource(Res.string.app_name),
+                                searchState = searchState,
+                                collapseCallback = { topAppBarExpanded = false },
+                                notificationCallback = {},
+                                searchCallback = {},
+                                burgerCallback = { dropdownExpanded = true },
+                                burgerContent = dropdown
+                            )
+                        },
+                        collapsedTopAppBar = {
+                            MyWaifuTopAppBar(
+                                title = stringResource(Res.string.app_name),
+                                expandCallback = { topAppBarExpanded = true },
+                                notificationCallback = {},
+                                burgerCallback = { dropdownExpanded = true },
+                                burgerContent = dropdown
+                            )
+                        },
+                    )
+                }
+            ) { paddingValues ->
+                Content(
+                    paddingValues = paddingValues,
+                    waifu = waifu,
+                    isLoadingMore = isLoadingMore,
+                    isInitialyLoaded = isInitialyLoaded,
+                    loadMoreCallback = loadMoreCallback,
+                    detailCallback = detailCallback
+                )
+            }
+        }
     }
 }
 

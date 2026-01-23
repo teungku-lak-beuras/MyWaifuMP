@@ -16,10 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import heaven.from.mywaifump.constant.sizeAppBarMenu
 import heaven.from.mywaifump.constant.sizeLarge
 import heaven.from.mywaifump.constant.sizeLarger
 import heaven.from.mywaifump.constant.sizeMedium
-import heaven.from.mywaifump.constant.sizeAppBarMenu
 import heaven.from.mywaifump.utility.MyWaifuPreview
 import mywaifump.composeapp.generated.resources.Res
 import mywaifump.composeapp.generated.resources.app_name
@@ -39,7 +39,7 @@ private val shape = RoundedCornerShape(
 )
 
 @Composable
-fun MyWaifuSideAppBar(
+private fun MyWaifuMPSideAppBar(
     burgerCallback: (() -> Unit)?,
     notificationCallback: (() -> Unit)?,
     searchCallback: (() -> Unit)?,
@@ -109,6 +109,21 @@ fun MyWaifuSideAppBar(
             )
         }
     }
+}
+
+@Composable
+fun MyWaifuSideAppBar(
+    burgerCallback: (() -> Unit),
+    notificationCallback: (() -> Unit),
+    searchCallback: (() -> Unit),
+    burgerContent: (@Composable () -> Unit)
+) {
+    MyWaifuMPSideAppBar(
+        burgerCallback = burgerCallback,
+        notificationCallback = notificationCallback,
+        searchCallback = searchCallback,
+        burgerContent = burgerContent
+    )
 }
 
 @Preview
