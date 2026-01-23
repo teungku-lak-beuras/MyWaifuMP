@@ -7,6 +7,8 @@
 
 package heaven.from.mywaifump.component
 
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,9 +44,9 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import heaven.from.mywaifump.constant.sizeAppBarMenu
 import heaven.from.mywaifump.constant.sizeLarger
 import heaven.from.mywaifump.constant.sizeMedium
-import heaven.from.mywaifump.constant.sizeAppBarMenu
 import heaven.from.mywaifump.utility.MyWaifuPreview
 import mywaifump.composeapp.generated.resources.Res
 import mywaifump.composeapp.generated.resources.arrow_small_left
@@ -241,7 +243,13 @@ private fun MyWaifuMPTopAppBar(
                                 else {
                                     false
                                 }
-                            },
+                            }
+                            /**
+                             * Do not delete this focusable modifier. If you delete this, the IME
+                             * will be shown everytime the screen is launches for the first time. I
+                             * don't know why.
+                             */
+                            .focusable(interactionSource = remember { MutableInteractionSource() }),
                         contentPadding = PaddingValues(
                             start = sizeMedium,
                             end = sizeMedium
