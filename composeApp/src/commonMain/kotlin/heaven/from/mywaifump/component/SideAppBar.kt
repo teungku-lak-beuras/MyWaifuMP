@@ -23,6 +23,8 @@ import heaven.from.mywaifump.constant.sizeMedium
 import heaven.from.mywaifump.utility.MyWaifuPreview
 import mywaifump.composeapp.generated.resources.Res
 import mywaifump.composeapp.generated.resources.app_name
+import mywaifump.composeapp.generated.resources.arrow_small_left
+import mywaifump.composeapp.generated.resources.back
 import mywaifump.composeapp.generated.resources.bell
 import mywaifump.composeapp.generated.resources.menu_burger
 import mywaifump.composeapp.generated.resources.notification
@@ -40,6 +42,7 @@ private val shape = RoundedCornerShape(
 
 @Composable
 private fun MyWaifuMPSideAppBar(
+    popCallback: (() -> Unit)?,
     burgerCallback: (() -> Unit)?,
     notificationCallback: (() -> Unit)?,
     searchCallback: (() -> Unit)?,
@@ -59,12 +62,22 @@ private fun MyWaifuMPSideAppBar(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
+                if (popCallback != null) {
+                    MyWaifuAppBarMenu(
+                        onClickCallback = popCallback
+                    ) {
+                        Icon(
+                            contentDescription = stringResource(Res.string.back),
+                            painter = painterResource(Res.drawable.arrow_small_left)
+                        )
+                    }
+                }
                 if (burgerCallback != null) {
                     MyWaifuAppBarMenu(
                         onClickCallback = burgerCallback
                     ) {
                         Icon(
-                            contentDescription = "Notifications",
+                            contentDescription = stringResource(Res.string.notification),
                             painter = painterResource(Res.drawable.menu_burger)
                         )
                     }
@@ -119,6 +132,7 @@ fun MyWaifuSideAppBar(
     burgerContent: (@Composable () -> Unit)
 ) {
     MyWaifuMPSideAppBar(
+        popCallback = null,
         burgerCallback = burgerCallback,
         notificationCallback = notificationCallback,
         searchCallback = searchCallback,
@@ -126,13 +140,36 @@ fun MyWaifuSideAppBar(
     )
 }
 
+@Composable
+fun MyWaifuSideAppBar(
+    popCallback: () -> Unit,
+    notificationCallback: () -> Unit,
+) {
+    MyWaifuMPSideAppBar(
+        popCallback = popCallback,
+        burgerCallback = null,
+        notificationCallback = notificationCallback,
+        searchCallback = null,
+        burgerContent = null
+    )
+}
+
 @Preview
 @Composable
-fun MyWaifuSideAppBarPreview1() = MyWaifuPreview {
+private fun MyWaifuSideAppBarPreview1() = MyWaifuPreview {
     MyWaifuSideAppBar(
         burgerCallback = {},
         notificationCallback = {},
         searchCallback = {},
         burgerContent = {}
+    )
+}
+
+@Preview
+@Composable
+private fun MyWaifuSideAppBarPreview2() = MyWaifuPreview {
+    MyWaifuSideAppBar(
+        popCallback = {},
+        notificationCallback = {}
     )
 }

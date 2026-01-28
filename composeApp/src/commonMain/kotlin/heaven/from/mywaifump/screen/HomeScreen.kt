@@ -103,7 +103,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun Dropdown(
+private fun Dropdown(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
     helpCallback: () -> Unit,
@@ -187,7 +187,7 @@ fun LoadingItem() {
 }
 
 @Composable
-fun SuccessItem(
+private fun SuccessItem(
     waifu: MyWaifuModelV2,
     detailCallback: (MyWaifuModelV2) -> Unit,
 ) {
@@ -395,7 +395,7 @@ fun SuccessItem(
 }
 
 @Composable
-fun ErrorItem() {
+private fun ErrorItem() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -413,7 +413,7 @@ fun ErrorItem() {
 }
 
 @Composable
-fun Content(
+private fun Content(
     paddingValues: PaddingValues,
     isLoadingMore: Boolean,
     isInitialyLoaded: Boolean,

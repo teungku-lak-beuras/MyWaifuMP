@@ -2,6 +2,7 @@ package heaven.from.mywaifump.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -13,7 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import heaven.from.mywaifump.component.MyWaifuSideAppBar
 import heaven.from.mywaifump.component.MyWaifuTopAppBar
+import heaven.from.mywaifump.composition_provider.LocalWindowSize
 import heaven.from.mywaifump.constant.WindowSize
 import heaven.from.mywaifump.constant.sizeMedium
 import heaven.from.mywaifump.layout.MyWaifuScaffold
@@ -31,72 +34,113 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
+private fun Content(
+    paddingValues: PaddingValues
+) {
+    Column(
+        modifier = Modifier.verticalScroll(rememberScrollState())
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(paddingValues)
+                .padding(
+                    top = sizeMedium,
+                    start = sizeMedium,
+                    end = sizeMedium
+                ),
+            style = MaterialTheme.typography.titleLarge,
+            text = "Hi, there! :)"
+        )
+        Column(
+            modifier = Modifier.padding(sizeMedium)
+        ) {
+            Text(
+                textAlign = TextAlign.Justify,
+                text = stringResource(Res.string.about_1)
+            )
+            HorizontalDivider(modifier = Modifier.padding(vertical = sizeMedium))
+            Text(
+                style = MaterialTheme.typography.titleMedium,
+                text = stringResource(Res.string.nekos_best_api)
+            )
+            Image(
+                modifier = Modifier.padding(top = sizeMedium),
+                contentDescription = stringResource(Res.string.nekos_best_api_website_image),
+                painter = painterResource(Res.drawable.nekos_best_api)
+            )
+            Text(
+                modifier = Modifier.padding(top = sizeMedium),
+                textAlign = TextAlign.Justify,
+                text = stringResource(Res.string.about_2)
+            )
+            HorizontalDivider(modifier = Modifier.padding(vertical = sizeMedium))
+            Text(
+                style = MaterialTheme.typography.titleMedium,
+                text = stringResource(Res.string.nekosia_cat_api)
+            )
+            Image(
+                modifier = Modifier.padding(top = sizeMedium),
+                contentDescription = stringResource(Res.string.nekosia_cat_api_website_image),
+                painter = painterResource(Res.drawable.nekosia_cat_api)
+            )
+            Text(
+                modifier = Modifier.padding(top = sizeMedium),
+                textAlign = TextAlign.Justify,
+                text = stringResource(Res.string.about_3)
+            )
+            HorizontalDivider(modifier = Modifier.padding(vertical = sizeMedium))
+            Text(
+                textAlign = TextAlign.Justify,
+                text = stringResource(Res.string.about_4)
+            )
+        }
+    }
+}
+
+@Composable
 fun AboutScreen(
     popCallback: () -> Unit
 ) {
-    MyWaifuScaffold(
-        topAppBar = {
-            MyWaifuTopAppBar(
-                title = "About",
-                popCallback = popCallback
-            )
+    when (LocalWindowSize.current) {
+        WindowSize.Compact -> {
+            MyWaifuScaffold(
+                topAppBar = {
+                    MyWaifuTopAppBar(
+                        title = "About",
+                        popCallback = popCallback
+                    )
+                }
+            ) { paddingValues ->
+                Content(
+                    paddingValues = paddingValues
+                )
+            }
         }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier.verticalScroll(rememberScrollState())
-        ) {
-            Text(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .padding(
-                        top = sizeMedium,
-                        start = sizeMedium,
-                        end = sizeMedium
-                    ),
-                style = MaterialTheme.typography.titleLarge,
-                text = "Hi, there! :)"
-            )
-            Column(
-                modifier = Modifier.padding(sizeMedium)
+        WindowSize.Medium -> {
+            MyWaifuScaffold(
+                sideAppBar = {
+                    MyWaifuSideAppBar(
+                        popCallback = popCallback,
+                        notificationCallback = {}
+                    )
+                }
             ) {
-                Text(
-                    textAlign = TextAlign.Justify,
-                    text = stringResource(Res.string.about_1)
+                Content(
+                    paddingValues = PaddingValues(sizeMedium)
                 )
-                HorizontalDivider(modifier = Modifier.padding(vertical = sizeMedium))
-                Text(
-                    style = MaterialTheme.typography.titleMedium,
-                    text = stringResource(Res.string.nekos_best_api)
-                )
-                Image(
-                    modifier = Modifier.padding(top = sizeMedium),
-                    contentDescription = stringResource(Res.string.nekos_best_api_website_image),
-                    painter = painterResource(Res.drawable.nekos_best_api)
-                )
-                Text(
-                    modifier = Modifier.padding(top = sizeMedium),
-                    textAlign = TextAlign.Justify,
-                    text = stringResource(Res.string.about_2)
-                )
-                HorizontalDivider(modifier = Modifier.padding(vertical = sizeMedium))
-                Text(
-                    style = MaterialTheme.typography.titleMedium,
-                    text = stringResource(Res.string.nekosia_cat_api)
-                )
-                Image(
-                    modifier = Modifier.padding(top = sizeMedium),
-                    contentDescription = stringResource(Res.string.nekosia_cat_api_website_image),
-                    painter = painterResource(Res.drawable.nekosia_cat_api)
-                )
-                Text(
-                    modifier = Modifier.padding(top = sizeMedium),
-                    textAlign = TextAlign.Justify,
-                    text = stringResource(Res.string.about_3)
-                )
-                HorizontalDivider(modifier = Modifier.padding(vertical = sizeMedium))
-                Text(
-                    textAlign = TextAlign.Justify,
-                    text = stringResource(Res.string.about_4)
+            }
+        }
+        WindowSize.Expanded -> {
+            MyWaifuScaffold(
+                sideAppBar = {
+                    MyWaifuSideAppBar(
+                        popCallback = popCallback,
+                        notificationCallback = {}
+                    )
+                }
+            ) {
+                Content(
+                    paddingValues = PaddingValues(sizeMedium)
                 )
             }
         }
@@ -104,7 +148,7 @@ fun AboutScreen(
 }
 
 @Composable
-fun AboutScreenPreview() {
+private fun AboutScreenPreview() {
     AboutScreen(
         popCallback = {}
     )
@@ -112,7 +156,7 @@ fun AboutScreenPreview() {
 
 @Preview
 @Composable
-fun AboutScreenAndroidPreview() {
+private fun AboutScreenAndroidPreview() {
     MyWaifuPreview {
         AboutScreenPreview()
     }
@@ -120,7 +164,7 @@ fun AboutScreenAndroidPreview() {
 
 @Preview(device = Devices.TABLET)
 @Composable
-fun AboutScreenTabletPreview() {
+private fun AboutScreenTabletPreview() {
     MyWaifuPreview(
         windowSize = WindowSize.Medium
     ) {
@@ -130,7 +174,7 @@ fun AboutScreenTabletPreview() {
 
 @Preview(device = Devices.DESKTOP)
 @Composable
-fun AboutScreenDesktopPreview() {
+private fun AboutScreenDesktopPreview() {
     MyWaifuPreview(
         windowSize = WindowSize.Expanded
     ) {
