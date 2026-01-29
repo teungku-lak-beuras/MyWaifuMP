@@ -621,34 +621,17 @@ fun HomeScreen(
         }
         WindowSize.Expanded -> {
             MyWaifuScaffold(
-                topAppBar = {
-                    MyWaifuSwitchingTopAppBar(
-                        expanded = topAppBarExpanded,
-                        expandedTopAppBar = {
-                            MyWaifuTopAppBar(
-                                title = stringResource(Res.string.app_name),
-                                searchState = searchState,
-                                collapseCallback = { topAppBarExpanded = false },
-                                notificationCallback = {},
-                                searchCallback = {},
-                                burgerCallback = { dropdownExpanded = true },
-                                burgerContent = dropdown
-                            )
-                        },
-                        collapsedTopAppBar = {
-                            MyWaifuTopAppBar(
-                                title = stringResource(Res.string.app_name),
-                                expandCallback = { topAppBarExpanded = true },
-                                notificationCallback = {},
-                                burgerCallback = { dropdownExpanded = true },
-                                burgerContent = dropdown
-                            )
-                        },
+                sideAppBar = {
+                    MyWaifuSideAppBar(
+                        burgerCallback = { dropdownExpanded = true },
+                        notificationCallback = {},
+                        searchCallback = {},
+                        burgerContent = dropdown
                     )
                 }
-            ) { paddingValues ->
+            ) {
                 Content(
-                    paddingValues = paddingValues,
+                    paddingValues = PaddingValues(0.dp),
                     waifu = waifu,
                     isLoadingMore = isLoadingMore,
                     isInitialyLoaded = isInitialyLoaded,

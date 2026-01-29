@@ -81,22 +81,10 @@ fun DetailScreen(
             Column(
                 modifier = Modifier.padding(sizeMedium)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = waifu.artistName,
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                    TextButton(
-                        onClick = {
-                            uriHandler.openUri(waifu.artistUrl)
-                        }
-                    ) {
-                        Text("Visit artist's page")
-                    }
-                }
+                Text(
+                    text = waifu.artistName,
+                    style = MaterialTheme.typography.titleLarge
+                )
                 Text(
                     text = "Rating: ${waifu.rating}"
                 )
@@ -112,6 +100,14 @@ fun DetailScreen(
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
+                        uriHandler.openUri(waifu.artistUrl)
+                    }
+                ) {
+                    Text("Visit artist's page")
+                }
+                TextButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
                         uriHandler.openUri(waifu.imageSourceUrl)
                     }
                 ) {
@@ -124,7 +120,7 @@ fun DetailScreen(
 
 @Preview
 @Composable
-fun DetailScreenPreview1() = MyWaifuPreview {
+private fun DetailScreenPreview1() = MyWaifuPreview {
     DetailScreen(
         waifu = MyWaifuModelV2(
             "bruh",
