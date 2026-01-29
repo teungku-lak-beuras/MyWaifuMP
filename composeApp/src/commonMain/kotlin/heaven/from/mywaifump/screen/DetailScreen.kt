@@ -1,9 +1,8 @@
 package heaven.from.mywaifump.screen
 
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -22,97 +21,149 @@ import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import heaven.from.model.MyWaifuModelV2
+import heaven.from.mywaifump.component.MyWaifuFloatingAppBar
+import heaven.from.mywaifump.component.MyWaifuSideAppBar
 import heaven.from.mywaifump.component.MyWaifuTopAppBar
+import heaven.from.mywaifump.composition_provider.LocalWindowSize
+import heaven.from.mywaifump.constant.WindowSize
 import heaven.from.mywaifump.constant.sizeMedium
-import heaven.from.mywaifump.layout.MyWaifuScaffold
+import heaven.from.mywaifump.layout.MyWaifuCompactScaffold
+import heaven.from.mywaifump.layout.MyWaifuExpandedScaffold
+import heaven.from.mywaifump.layout.MyWaifuMediumScaffold
 import heaven.from.mywaifump.utility.MyWaifuPreview
 import mywaifump.composeapp.generated.resources.Res
 import mywaifump.composeapp.generated.resources.error_bug
 import mywaifump.composeapp.generated.resources.picture
+import mywaifump.composeapp.generated.resources.waifu_detail
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+
+@Composable
+private fun Content(
+    paddingValues: PaddingValues,
+    waifu: MyWaifuModelV2
+) {
+    Column(
+        modifier = Modifier.verticalScroll(rememberScrollState())
+    ) {
+        val model = ImageRequest
+            .Builder(LocalPlatformContext.current)
+            .data(waifu.cdnCompressedImageUrl)
+            .build()
+        val uriHandler = LocalUriHandler.current
+
+        AsyncImage(
+            modifier = Modifier
+                .padding(paddingValues)
+                .padding(
+                    top = sizeMedium,
+                    start = sizeMedium,
+                    end = sizeMedium
+                )
+                .align(Alignment.CenterHorizontally)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.inverseSurface
+                ),
+            contentDescription = "Waifu drawn by ${waifu.artistName}",
+            placeholder = painterResource(Res.drawable.picture),
+            error = painterResource(Res.drawable.error_bug),
+            model = model
+        )
+        HorizontalDivider(
+            modifier = Modifier.padding(
+                top = sizeMedium,
+                start = sizeMedium,
+                end = sizeMedium
+            )
+        )
+        Column(
+            modifier = Modifier.padding(sizeMedium)
+        ) {
+            Text(
+                text = waifu.artistName,
+                style = MaterialTheme.typography.titleLarge
+            )
+            Text(
+                text = "Rating: ${waifu.rating}"
+            )
+            Text(
+                text = "Category: ${waifu.category}"
+            )
+            Text(
+                text = "Tags: ${waifu.tags}"
+            )
+            Text(
+                text = waifu.copyright
+            )
+            TextButton(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    uriHandler.openUri(waifu.artistUrl)
+                }
+            ) {
+                Text("Visit artist's page")
+            }
+            TextButton(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    uriHandler.openUri(waifu.imageSourceUrl)
+                }
+            ) {
+                Text("Visit waifu's page")
+            }
+        }
+    }
+}
 
 @Composable
 fun DetailScreen(
     waifu: MyWaifuModelV2,
     popCallback: () -> Unit
 ) {
-    MyWaifuScaffold(
-        topAppBar = {
-            MyWaifuTopAppBar(
-                title = "Waifu Detail",
-                popCallback = popCallback
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier.verticalScroll(rememberScrollState())
-        ) {
-            val model = ImageRequest
-                .Builder(LocalPlatformContext.current)
-                .data(waifu.cdnCompressedImageUrl)
-                .build()
-            val uriHandler = LocalUriHandler.current
-
-            AsyncImage(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .padding(
-                        top = sizeMedium,
-                        start = sizeMedium,
-                        end = sizeMedium
+    when (LocalWindowSize.current) {
+        WindowSize.Compact -> {
+            MyWaifuCompactScaffold(
+                topAppBar = {
+                    MyWaifuTopAppBar(
+                        title = stringResource(Res.string.waifu_detail),
+                        popCallback = popCallback
                     )
-                    .align(Alignment.CenterHorizontally)
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.inverseSurface
-                    ),
-                contentDescription = "Waifu drawn by ${waifu.artistName}",
-                placeholder = painterResource(Res.drawable.picture),
-                error = painterResource(Res.drawable.error_bug),
-                model = model
-            )
-            HorizontalDivider(
-                modifier = Modifier.padding(
-                    top = sizeMedium,
-                    start = sizeMedium,
-                    end = sizeMedium
+                }
+            ) { paddingValues ->
+                Content(
+                    paddingValues = paddingValues,
+                    waifu = waifu
                 )
-            )
-            Column(
-                modifier = Modifier.padding(sizeMedium)
+            }
+        }
+        WindowSize.Medium -> {
+            MyWaifuMediumScaffold(
+                sideAppBar = {
+                    MyWaifuSideAppBar(
+                        popCallback = popCallback
+                    )
+                }
             ) {
-                Text(
-                    text = waifu.artistName,
-                    style = MaterialTheme.typography.titleLarge
+                Content(
+                    paddingValues = PaddingValues(sizeMedium),
+                    waifu = waifu
                 )
-                Text(
-                    text = "Rating: ${waifu.rating}"
-                )
-                Text(
-                    text = "Category: ${waifu.category}"
-                )
-                Text(
-                    text = "Tags: ${waifu.tags}"
-                )
-                Text(
-                    text = waifu.copyright
-                )
-                TextButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = {
-                        uriHandler.openUri(waifu.artistUrl)
-                    }
-                ) {
-                    Text("Visit artist's page")
+            }
+        }
+        WindowSize.Expanded -> {
+            MyWaifuExpandedScaffold(
+                floatingAppBar = {
+                    MyWaifuFloatingAppBar(
+                        title = stringResource(Res.string.waifu_detail),
+                        popCallback = popCallback
+                    )
                 }
-                TextButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = {
-                        uriHandler.openUri(waifu.imageSourceUrl)
-                    }
-                ) {
-                    Text("Visit waifu's page")
-                }
+            ) { paddingValues ->
+                Content(
+                    paddingValues = paddingValues,
+                    waifu = waifu
+                )
             }
         }
     }

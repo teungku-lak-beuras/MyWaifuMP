@@ -75,13 +75,16 @@ import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import heaven.from.model.MyWaifuModelV2
 import heaven.from.model.MyWaifuState
+import heaven.from.mywaifump.component.MyWaifuFloatingAppBar
 import heaven.from.mywaifump.component.MyWaifuSideAppBar
 import heaven.from.mywaifump.component.MyWaifuTopAppBar
 import heaven.from.mywaifump.composition_provider.LocalWindowSize
 import heaven.from.mywaifump.constant.WindowSize
 import heaven.from.mywaifump.constant.sizeMedium
 import heaven.from.mywaifump.constant.sizeSmall
-import heaven.from.mywaifump.layout.MyWaifuScaffold
+import heaven.from.mywaifump.layout.MyWaifuCompactScaffold
+import heaven.from.mywaifump.layout.MyWaifuExpandedScaffold
+import heaven.from.mywaifump.layout.MyWaifuMediumScaffold
 import heaven.from.mywaifump.layout.MyWaifuSwitchingTopAppBar
 import heaven.from.mywaifump.utility.MyWaifuPreview
 import heaven.from.mywaifump.utility.plus
@@ -561,7 +564,7 @@ fun HomeScreen(
      */
     when (LocalWindowSize.current) {
         WindowSize.Compact -> {
-            MyWaifuScaffold(
+            MyWaifuCompactScaffold(
                 topAppBar = {
                     MyWaifuSwitchingTopAppBar(
                         expanded = topAppBarExpanded,
@@ -599,7 +602,7 @@ fun HomeScreen(
             }
         }
         WindowSize.Medium -> {
-            MyWaifuScaffold(
+            MyWaifuMediumScaffold(
                 sideAppBar = {
                     MyWaifuSideAppBar(
                         burgerCallback = { dropdownExpanded = true },
@@ -620,18 +623,20 @@ fun HomeScreen(
             }
         }
         WindowSize.Expanded -> {
-            MyWaifuScaffold(
-                sideAppBar = {
-                    MyWaifuSideAppBar(
-                        burgerCallback = { dropdownExpanded = true },
+            MyWaifuExpandedScaffold(
+                floatingAppBar = {
+                    MyWaifuFloatingAppBar(
+                        title = stringResource(Res.string.app_name),
+                        searchState = searchState,
                         notificationCallback = {},
                         searchCallback = {},
+                        burgerCallback = { dropdownExpanded = true },
                         burgerContent = dropdown
                     )
                 }
-            ) {
+            ) { paddingValues ->
                 Content(
-                    paddingValues = PaddingValues(0.dp),
+                    paddingValues = paddingValues,
                     waifu = waifu,
                     isLoadingMore = isLoadingMore,
                     isInitialyLoaded = isInitialyLoaded,

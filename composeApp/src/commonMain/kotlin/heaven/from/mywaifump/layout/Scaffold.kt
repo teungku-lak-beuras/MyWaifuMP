@@ -19,20 +19,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import heaven.from.mywaifump.component.MyWaifuFloatingAppBar
 import heaven.from.mywaifump.component.MyWaifuSideAppBar
 import heaven.from.mywaifump.component.MyWaifuTopAppBar
 import heaven.from.mywaifump.constant.WindowSize
+import heaven.from.mywaifump.constant.sizeLarger
+import heaven.from.mywaifump.constant.sizeMedium
 import heaven.from.mywaifump.utility.MyWaifuPreview
 
 @Composable
-fun MyWaifuScaffold(
-    topAppBar: (@Composable () -> Unit),
-    content: (@Composable (PaddingValues) -> Unit)
+fun MyWaifuCompactScaffold(
+    topAppBar: @Composable () -> Unit,
+    content: @Composable (PaddingValues) -> Unit
 ) {
     var spacerHeight by remember { mutableIntStateOf(0) }
 
@@ -66,7 +70,7 @@ fun MyWaifuScaffold(
 }
 
 @Composable
-fun MyWaifuScaffold(
+fun MyWaifuMediumScaffold(
     sideAppBar: @Composable () -> Unit,
     content: @Composable () -> Unit
 ) {
@@ -90,43 +94,40 @@ fun MyWaifuScaffold(
 }
 
 @Composable
-fun MyWaifuPortraitScaffoldPreview() {
-    MyWaifuScaffold(
-        topAppBar = {
-            MyWaifuTopAppBar(
-                title = "Administrator",
-                leadingTitle = "Welcome",
-                searchState = rememberTextFieldState(),
-                collapseCallback = {},
-                notificationCallback = {},
-                burgerCallback = {},
-                searchCallback = {},
-                burgerContent = {}
-            )
-        },
-        content = { paddingValues ->
-            Text(
-                modifier = Modifier
-                    .padding(paddingValues),
-                text = "Hello world!"
-            )
-        }
-    )
-}
+fun MyWaifuExpandedScaffold(
+    floatingAppBar: @Composable () -> Unit,
+    content: @Composable (PaddingValues) -> Unit
+) {
+    var spacerHeight by remember { mutableIntStateOf(0) }
 
-@Composable
-fun MyWaifuLandscapeScaffoldPreview() {
-    MyWaifuScaffold(
-        sideAppBar = {
-            MyWaifuSideAppBar(
-                burgerCallback = {},
-                notificationCallback = {},
-                searchCallback = {},
-                burgerContent = {}
+    Surface(
+        modifier = Modifier
+            .windowInsetsPadding(WindowInsets.displayCutout)
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .windowInsetsPadding(WindowInsets.navigationBars),
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            content.invoke(
+                PaddingValues(
+                    top = with (LocalDensity.current) {
+                        spacerHeight.toDp()
+                    }
+                )
             )
         }
-    ) {
-        Text("content goes here")
+        Box(
+            modifier = Modifier
+                .onGloballyPositioned { layoutCoordinates ->
+                    spacerHeight = layoutCoordinates.size.height
+                }
+                .padding(sizeMedium),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            floatingAppBar.invoke()
+        }
     }
 }
 
@@ -134,9 +135,29 @@ fun MyWaifuLandscapeScaffoldPreview() {
     showSystemUi = true
 )
 @Composable
-fun MyWaifuPortraitScaffoldAndroidPreview() {
+private fun MyWaifuCompactScaffoldPreview() {
     MyWaifuPreview {
-        MyWaifuPortraitScaffoldPreview()
+        MyWaifuCompactScaffold(
+            topAppBar = {
+                MyWaifuTopAppBar(
+                    title = "Administrator",
+                    leadingTitle = "Welcome",
+                    searchState = rememberTextFieldState(),
+                    collapseCallback = {},
+                    notificationCallback = {},
+                    burgerCallback = {},
+                    searchCallback = {},
+                    burgerContent = {}
+                )
+            },
+            content = { paddingValues ->
+                Text(
+                    modifier = Modifier
+                        .padding(paddingValues),
+                    text = "Hello world!"
+                )
+            }
+        )
     }
 }
 
@@ -145,11 +166,22 @@ fun MyWaifuPortraitScaffoldAndroidPreview() {
     showSystemUi = true
 )
 @Composable
-fun MyWaifuPortraitScaffoldTabletPreview() {
+private fun MyWaifuMediumScaffoldPreview() {
     MyWaifuPreview(
         windowSize = WindowSize.Medium
     ) {
-        MyWaifuLandscapeScaffoldPreview()
+        MyWaifuMediumScaffold(
+            sideAppBar = {
+                MyWaifuSideAppBar(
+                    burgerCallback = {},
+                    notificationCallback = {},
+                    searchCallback = {},
+                    burgerContent = {}
+                )
+            }
+        ) {
+            Text("content goes here")
+        }
     }
 }
 
@@ -158,10 +190,27 @@ fun MyWaifuPortraitScaffoldTabletPreview() {
     showSystemUi = true
 )
 @Composable
-fun MyWaifuPortraitScaffoldDesktopPreview() {
+private fun MyWaifuExpandedScaffoldPreview() {
     MyWaifuPreview(
         windowSize = WindowSize.Expanded
     ) {
-        MyWaifuPortraitScaffoldPreview()
+        MyWaifuExpandedScaffold(
+            floatingAppBar = {
+                MyWaifuFloatingAppBar(
+                    title = "Administrator",
+                    leadingTitle = "Welcome",
+                    searchState = rememberTextFieldState(),
+                    notificationCallback = {},
+                    burgerCallback = {},
+                    searchCallback = {},
+                    burgerContent = {}
+                )
+            }
+        ) { paddingValues ->
+            Text(
+                modifier = Modifier.padding(paddingValues),
+                text = "content goes here"
+            )
+        }
     }
 }

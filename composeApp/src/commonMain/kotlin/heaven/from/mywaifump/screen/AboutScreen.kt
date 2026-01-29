@@ -14,14 +14,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import heaven.from.mywaifump.component.MyWaifuFloatingAppBar
 import heaven.from.mywaifump.component.MyWaifuSideAppBar
 import heaven.from.mywaifump.component.MyWaifuTopAppBar
 import heaven.from.mywaifump.composition_provider.LocalWindowSize
 import heaven.from.mywaifump.constant.WindowSize
 import heaven.from.mywaifump.constant.sizeMedium
-import heaven.from.mywaifump.layout.MyWaifuScaffold
+import heaven.from.mywaifump.layout.MyWaifuCompactScaffold
+import heaven.from.mywaifump.layout.MyWaifuExpandedScaffold
+import heaven.from.mywaifump.layout.MyWaifuMediumScaffold
 import heaven.from.mywaifump.utility.MyWaifuPreview
 import mywaifump.composeapp.generated.resources.Res
+import mywaifump.composeapp.generated.resources.about
 import mywaifump.composeapp.generated.resources.about_1
 import mywaifump.composeapp.generated.resources.about_2
 import mywaifump.composeapp.generated.resources.about_3
@@ -103,10 +107,10 @@ fun AboutScreen(
 ) {
     when (LocalWindowSize.current) {
         WindowSize.Compact -> {
-            MyWaifuScaffold(
+            MyWaifuCompactScaffold(
                 topAppBar = {
                     MyWaifuTopAppBar(
-                        title = "About",
+                        title = stringResource(Res.string.about),
                         popCallback = popCallback
                     )
                 }
@@ -117,11 +121,10 @@ fun AboutScreen(
             }
         }
         WindowSize.Medium -> {
-            MyWaifuScaffold(
+            MyWaifuMediumScaffold(
                 sideAppBar = {
                     MyWaifuSideAppBar(
-                        popCallback = popCallback,
-                        notificationCallback = {}
+                        popCallback = popCallback
                     )
                 }
             ) {
@@ -131,16 +134,16 @@ fun AboutScreen(
             }
         }
         WindowSize.Expanded -> {
-            MyWaifuScaffold(
-                sideAppBar = {
-                    MyWaifuSideAppBar(
-                        popCallback = popCallback,
-                        notificationCallback = {}
+            MyWaifuExpandedScaffold(
+                floatingAppBar = {
+                    MyWaifuFloatingAppBar(
+                        title = stringResource(Res.string.about),
+                        popCallback = popCallback
                     )
                 }
-            ) {
+            ) { paddingValues ->
                 Content(
-                    paddingValues = PaddingValues(sizeMedium)
+                    paddingValues = paddingValues
                 )
             }
         }

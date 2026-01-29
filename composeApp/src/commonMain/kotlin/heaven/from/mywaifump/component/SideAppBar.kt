@@ -143,12 +143,11 @@ fun MyWaifuSideAppBar(
 @Composable
 fun MyWaifuSideAppBar(
     popCallback: () -> Unit,
-    notificationCallback: () -> Unit,
 ) {
     MyWaifuMPSideAppBar(
         popCallback = popCallback,
         burgerCallback = null,
-        notificationCallback = notificationCallback,
+        notificationCallback = null,
         searchCallback = null,
         burgerContent = null
     )
@@ -169,7 +168,6 @@ private fun MyWaifuSideAppBarPreview1() = MyWaifuPreview {
 @Composable
 private fun MyWaifuSideAppBarPreview2() = MyWaifuPreview {
     MyWaifuSideAppBar(
-        popCallback = {},
-        notificationCallback = {}
+        popCallback = {}
     )
 }

@@ -11,6 +11,7 @@
     <string name="collapse">Collapse</string>
     <string name="more_menu">More menu</string>
     <string name="back">Back to previous page</string>
+    <string name="waifu_detail">Waifu detail</string>
 
     <!-- States -->
     <string name="loading">Loading</string>
